@@ -38,5 +38,3 @@ mvnw.cmd
 
 ### Other Files ###
 .gitattributes
-*.properties
-*.yaml
