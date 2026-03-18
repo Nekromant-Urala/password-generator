@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: NauJava
+
+  messages:
+    encoding: UTF-8
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/NauJava
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: true
+        highlight_sql: true
+        hbm2ddl:
+          auto: create-drop
+
+  test:
+    database:
+      replace: none
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+app:
+  name: "Password Generator"
+  version: "1.0.1"
+  time:
+    formatter: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+  message:
+    name: "%s  INFO Текущее название приложения: %s\n"
+    version: "%s  INFO Текущая версия приложения: %s\n"
+

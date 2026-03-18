@@ -1,30 +1,44 @@
 package ru.matthew.NauJava.entity;
 
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "passwords")
 public class PasswordEntry {
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "login")
     private String login;
+
+    @Column(name = "encrypt_password")
     private String password;
-    private String serviceName;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "description")
     private String description;
 
-    public PasswordEntry() {
-        created_at = LocalDateTime.now();
-    }
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public PasswordEntry(PasswordEntry other) {
-        this.id = other.id;
-        this.login = other.login;
-        this.password = other.password;
-        this.serviceName = other.serviceName;
-        this.created_at = other.created_at;
-        this.updated_at = other.updated_at;
-        this.description = other.description;
+    @ManyToOne
+    @JoinColumn(name = "service_id")
+    private ServiceEntry serviceName;
+
+
+    public PasswordEntry() {
+        createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -51,28 +65,20 @@ public class PasswordEntry {
         this.password = password;
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    public void setCreatedAt(LocalDateTime created_at) {
+        this.createdAt = created_at;
     }
 
-    public LocalDateTime getCreated_at() {
-        return created_at;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
-    }
-
-    public LocalDateTime getUpdated_at() {
-        return updated_at;
-    }
-
-    public void setUpdated_at(LocalDateTime updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(LocalDateTime updated_at) {
+        this.updatedAt = updated_at;
     }
 
     public String getDescription() {
@@ -83,29 +89,19 @@ public class PasswordEntry {
         this.description = description;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        PasswordEntry that = (PasswordEntry) o;
-        return Objects.equals(id, that.id) && Objects.equals(login, that.login) && Objects.equals(password, that.password) && Objects.equals(serviceName, that.serviceName) && Objects.equals(created_at, that.created_at) && Objects.equals(updated_at, that.updated_at) && Objects.equals(description, that.description);
+    public ServiceEntry getServiceName() {
+        return serviceName;
     }
 
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, login, password, serviceName, created_at, updated_at, description);
+    public void setServiceName(ServiceEntry serviceEntryName) {
+        this.serviceName = serviceEntryName;
     }
 
-    @Override
-    public String toString() {
-        return "PasswordEntry{" +
-                "id=" + id +
-                ", login='" + login + '\'' +
-                ", password='" + password + '\'' +
-                ", serviceName='" + serviceName + '\'' +
-                ", created_at=" + created_at +
-                ", updated_at=" + updated_at +
-                ", description='" + description + '\'' +
-                '}';
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
