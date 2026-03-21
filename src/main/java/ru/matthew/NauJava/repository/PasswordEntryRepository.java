@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.matthew.NauJava.entity.PasswordEntry;
-import ru.matthew.NauJava.entity.ServiceEntry;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +24,7 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      *
      * @param serviceName наименование сервиса
      */
-    void deletePasswordEntriesByServiceName(ServiceEntry serviceName);
+    void deleteByServiceName(String serviceName);
 
 
     /**
@@ -34,6 +33,6 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      * @param serviceName наименование сервиса
      * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
      */
-    @Query("SELECT e FROM PasswordEntry e WHERE e.serviceName.name = :serviceName")
+    @Query("SELECT e FROM PasswordEntry e WHERE e.serviceName = :serviceName")
     List<PasswordEntry> findByServiceName(@Param("serviceName") String serviceName);
 }

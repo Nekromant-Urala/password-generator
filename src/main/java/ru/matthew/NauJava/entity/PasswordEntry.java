@@ -25,17 +25,15 @@ public class PasswordEntry {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "service_name")
+    private String serviceName;
+
     @Column(name = "description")
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "service_id")
-    private ServiceEntry serviceName;
-
 
     public PasswordEntry() {
         createdAt = LocalDateTime.now();
@@ -89,12 +87,12 @@ public class PasswordEntry {
         this.description = description;
     }
 
-    public ServiceEntry getServiceName() {
+    public String getServiceName() {
         return serviceName;
     }
 
-    public void setServiceName(ServiceEntry serviceEntryName) {
-        this.serviceName = serviceEntryName;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     public User getUser() {

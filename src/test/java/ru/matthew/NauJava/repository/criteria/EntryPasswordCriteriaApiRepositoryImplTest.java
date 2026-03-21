@@ -1,6 +1,7 @@
 package ru.matthew.NauJava.repository.criteria;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,19 +9,19 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ActiveProfiles;
 import ru.matthew.NauJava.entity.PasswordEntry;
-import ru.matthew.NauJava.entity.ServiceEntry;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 @ComponentScan(basePackages = "ru.matthew.NauJava.repository.criteria")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class EntryPasswordCriteriaApiRepositoryImplTest {
 
     @Autowired
@@ -29,45 +30,33 @@ class EntryPasswordCriteriaApiRepositoryImplTest {
     @Autowired
     private EntryPasswordCriteriaApiRepository repository;
 
-    private ServiceEntry testService;
-    private ServiceEntry anotherService;
-    private LocalDateTime now;
+    private LocalDateTime nowTime;
 
     @BeforeEach
     void setUp() {
         entityManager.clear();
 
-        now = LocalDateTime.now();
+        nowTime = LocalDateTime.now();
 
-        testService = new ServiceEntry();
-        testService.setName("Test Service");
-        testService.setCategory("Test Category");
-        testService.setUrl("Test URL");
-        testService = entityManager.persistAndFlush(testService);
-
-        anotherService = new ServiceEntry();
-        anotherService.setName("Another Service");
-        anotherService.setCategory("Another Category");
-        anotherService.setUrl("Another URL");
-        anotherService = entityManager.persistAndFlush(anotherService);
     }
 
-    private PasswordEntry createPasswordEntry(String password, ServiceEntry service, LocalDateTime createdAt) {
+    private PasswordEntry createPasswordEntry(String password, String nameService, LocalDateTime createdAt) {
         PasswordEntry entry = new PasswordEntry();
         entry.setPassword(password);
-        entry.setServiceName(service);
         entry.setCreatedAt(createdAt);
+        entry.setServiceName(nameService);
         return entry;
     }
 
     @Test
-    void testFindByCreatedAtBetween() {
-        LocalDateTime startDate = now.minusDays(2);
-        LocalDateTime endDate = now.plusDays(2);
+    @DisplayName("успешное нахождение всех записей в заданном промежутке времени")
+    void testFindByCreatedAtBetween_Success() {
+        LocalDateTime startDate = nowTime.minusDays(2);
+        LocalDateTime endDate = nowTime.plusDays(2);
 
-        PasswordEntry entry1 = createPasswordEntry("password123", testService, now.minusDays(1));
-        PasswordEntry entry2 = createPasswordEntry("password456", testService, now);
-        PasswordEntry entry3 = createPasswordEntry("password789", anotherService, now.plusDays(1));
+        PasswordEntry entry1 = createPasswordEntry("password123", "testService", nowTime.minusDays(1));
+        PasswordEntry entry2 = createPasswordEntry("password456", "testService", nowTime);
+        PasswordEntry entry3 = createPasswordEntry("password789", "testService", nowTime.plusDays(8));
 
         entityManager.persistAndFlush(entry1);
         entityManager.persistAndFlush(entry2);
@@ -75,67 +64,76 @@ class EntryPasswordCriteriaApiRepositoryImplTest {
 
         List<PasswordEntry> foundEntries = repository.findByCreatedAtBetween(startDate, endDate);
 
-        assertThat(foundEntries).hasSize(3);
-        assertThat(foundEntries).extracting(PasswordEntry::getPassword)
-                .containsExactlyInAnyOrder("password123", "password456", "password789");
+        assertEquals(2, foundEntries.size());
+        List<PasswordEntry> password = List.of(entry1, entry2);
+        assertTrue(foundEntries.containsAll(password));
     }
 
     @Test
-    void testFindByCreatedAtBetweenNoEntriesInRange() {
-        LocalDateTime startDate = now.minusDays(10);
-        LocalDateTime endDate = now.minusDays(5);
+    @DisplayName("отсутствие записей в заданном промежутке")
+    void testFindByCreatedAtBetween_NoEntriesInRange() {
+        LocalDateTime startDate = nowTime.minusDays(10);
+        LocalDateTime endDate = nowTime.minusDays(5);
 
-        PasswordEntry entry1 = createPasswordEntry("password123", testService, now.minusDays(1));
-        PasswordEntry entry2 = createPasswordEntry("password456", testService, now);
+        PasswordEntry entry1 = createPasswordEntry("password123", "testService", nowTime.minusDays(1));
+        PasswordEntry entry2 = createPasswordEntry("password456", "testService", nowTime);
+        PasswordEntry entry3 = createPasswordEntry("password789", "testService", nowTime.plusDays(1));
+
         entityManager.persistAndFlush(entry1);
         entityManager.persistAndFlush(entry2);
+        entityManager.persistAndFlush(entry3);
 
         List<PasswordEntry> foundEntries = repository.findByCreatedAtBetween(startDate, endDate);
 
-        assertThat(foundEntries).isEmpty();
+        assertEquals(0, foundEntries.size());
+        List<PasswordEntry> password = List.of(entry1, entry2, entry3);
+        assertFalse(foundEntries.containsAll(password));
     }
 
     @RepeatedTest(value = 5)
-    void testFindByServiceNameWhenServiceNameExists() {
-        PasswordEntry entry1 = createPasswordEntry("password123", testService, now.minusDays(1));
-        PasswordEntry entry2 = createPasswordEntry("password456", testService, now);
-        PasswordEntry entry3 = createPasswordEntry("password789", anotherService, now.plusDays(1));
+    @DisplayName("нахождение записей по существующему имени сервиса")
+    void testFindByServiceName_WhenServiceNameExists() {
+        PasswordEntry entry1 = createPasswordEntry("password123", "testService", nowTime.minusDays(1));
+        PasswordEntry entry2 = createPasswordEntry("password456", "testService", nowTime);
+        PasswordEntry entry3 = createPasswordEntry("password789", "testService_2", nowTime.plusDays(1));
 
         entityManager.persistAndFlush(entry1);
         entityManager.persistAndFlush(entry2);
         entityManager.persistAndFlush(entry3);
 
-        List<PasswordEntry> foundEntries = repository.findByServiceName("Test Service");
+        List<PasswordEntry> foundEntries = repository.findByServiceName("testService");
 
-        assertThat(foundEntries).hasSize(2);
-        assertThat(foundEntries).extracting(PasswordEntry::getPassword)
-                .containsExactlyInAnyOrder("password123", "password456");
-        assertThat(foundEntries).allMatch(entry -> entry.getServiceName().getName().equals("Test Service"));
+        assertEquals(2, foundEntries.size());
+        List<PasswordEntry> entries = List.of(entry1, entry2);
+        assertTrue(foundEntries.containsAll(entries));
     }
 
     @Test
-    void testFindByServiceNameWhenServiceNameDoesNotExist() {
-        PasswordEntry entry1 = createPasswordEntry("password123", testService, now.minusDays(1));
+    @DisplayName("нахождение записей по не существующему имени сервиса")
+    void testFindByServiceName_WhenServiceName_DoesNotExist() {
+        PasswordEntry entry1 = createPasswordEntry("password123", "testService", nowTime.minusDays(1));
         entityManager.persistAndFlush(entry1);
 
-        List<PasswordEntry> foundEntries = repository.findByServiceName("Non-existent Service");
+        List<PasswordEntry> foundEntries = repository.findByServiceName("ServiceNameDoesNotExist");
 
-        assertThat(foundEntries).isEmpty();
+        assertTrue(foundEntries.isEmpty());
     }
 
     @Test
-    void testFindByServiceNameCaseSensitive() {
-        PasswordEntry entry1 = createPasswordEntry("password123", testService, now.minusDays(1));
+    @DisplayName("нахождение записей по чувствительному к регистру имени сервиса")
+    void testFindByServiceName_CaseSensitive() {
+        PasswordEntry entry1 = createPasswordEntry("password123", "testService", nowTime.minusDays(1));
         entityManager.persistAndFlush(entry1);
 
-        List<PasswordEntry> foundEntries = repository.findByServiceName("test service");
+        List<PasswordEntry> foundEntries = repository.findByServiceName("TestService");
 
-        assertThat(foundEntries).isEmpty();
+        assertTrue(foundEntries.isEmpty());
     }
 
 
     @Test
-    void testFindByServiceNameHandleNull() {
+    @DisplayName("обработка случая null в качестве имени сервиса")
+    void testFindByServiceName_HandleNull() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> repository.findByServiceName(null)
@@ -144,7 +142,8 @@ class EntryPasswordCriteriaApiRepositoryImplTest {
     }
 
     @Test
-    void testFindByServiceNameHandleEmptyString() {
+    @DisplayName("обработка случая пустой строки в качестве имени сервиса")
+    void testFindByServiceName_HandleEmptyString() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> repository.findByServiceName("")

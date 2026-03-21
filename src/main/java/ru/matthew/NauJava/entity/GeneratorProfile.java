@@ -170,4 +170,24 @@ public class GeneratorProfile {
     public void setCipher(CipherAlgorithm cipher) {
         this.cipher = cipher;
     }
+
+    @Override
+    public String toString() {
+        return "GeneratorProfile{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", passwordLength=" + passwordLength +
+                ", isUppercase=" + isUppercase +
+                ", isLowercase=" + isLowercase +
+                ", isDigits=" + isDigits +
+                ", isSpecialChars=" + isSpecialChars +
+                ", isAvoidAmbiguousChars=" + isAvoidAmbiguousChars +
+                ", isFavorite=" + isFavorite +
+                ", customChars='" + customChars + '\'' +
+                ", createAt=" + createAt +
+                ", user=" + user +
+                ", kdfAlgorithm=" + kdfAlgorithm +
+                ", cipher=" + cipher +
+                '}';
+    }
 }

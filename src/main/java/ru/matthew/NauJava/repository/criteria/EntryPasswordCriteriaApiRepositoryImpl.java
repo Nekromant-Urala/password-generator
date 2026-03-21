@@ -1,12 +1,9 @@
 package ru.matthew.NauJava.repository.criteria;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.matthew.NauJava.entity.PasswordEntry;
-import ru.matthew.NauJava.entity.ServiceEntry;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,8 +45,7 @@ public class EntryPasswordCriteriaApiRepositoryImpl implements EntryPasswordCrit
         var criteriaQuery = builder.createQuery(PasswordEntry.class);
         var root = criteriaQuery.from(PasswordEntry.class);
 
-        Join<PasswordEntry, ServiceEntry> join = root.join("serviceName", JoinType.INNER);
-        var predicate = builder.equal(join.get("name"), serviceName);
+        var predicate = builder.equal(root.get("serviceName"), serviceName);
 
         criteriaQuery.select(root).where(predicate);
 

@@ -31,9 +31,6 @@ public class KdfAlgorithm {
     @Column(name = "parallelism")
     private Integer parallelism;
 
-    @OneToMany(mappedBy = "kdfAlgorithm")
-    private List<GeneratorProfile> profiles;
-
     public Long getId() {
         return id;
     }

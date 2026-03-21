@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: NauJava
+
+  messages:
+    encoding: UTF-8
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: true
+        highlight_sql: true
+        hbm2ddl:
+          auto: create-drop
+
+  test:
+    database:
+      replace: none

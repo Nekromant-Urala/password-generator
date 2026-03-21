@@ -3,6 +3,7 @@ package ru.matthew.NauJava.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,17 +26,34 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<AuditLog> auditLogs;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PasswordEntry> passwordEntries = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PasswordEntry> passwordEntries;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GeneratorProfile> profiles;
+    private List<GeneratorProfile> profiles = new ArrayList<>();
 
     public User() {
         createdAt = LocalDateTime.now();
+    }
+
+    public void addPasswordEntries(PasswordEntry passwordEntry) {
+        passwordEntries.add(passwordEntry);
+        passwordEntry.setUser(this);
+    }
+
+    public void removePasswordEntry(PasswordEntry passwordEntry) {
+        passwordEntries.remove(passwordEntry);
+        passwordEntry.setUser(null);
+    }
+
+    public void addProfile(GeneratorProfile profile){
+        profiles.add(profile);
+        profile.setUser(this);
+    }
+
+    public void removeProfile(GeneratorProfile profile){
+        profiles.remove(profile);
+        profile.setUser(null);
     }
 
     public Long getId() {

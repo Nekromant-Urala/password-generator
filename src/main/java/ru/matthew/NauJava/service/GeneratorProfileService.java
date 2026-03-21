@@ -1,16 +1,14 @@
 package ru.matthew.NauJava.service;
 
 import ru.matthew.NauJava.entity.GeneratorProfile;
-import ru.matthew.NauJava.entity.User;
 
 public interface GeneratorProfileService {
 
     /**
-     * Сохраняет конфигурацию создания
+     * Создает конфигурацию-генерации паролей для конкретного пользователя
      *
-     * @param userId           идентификатор пользователя
-     * @param generatorProfile профайл генерации паролей
-     * @return возвращает созданный профайл
+     * @param userId идентификатор пользователя
+     * @param profile профайл-генерации паролей
      */
-    GeneratorProfile createProfileForUser(Long userId, GeneratorProfile generatorProfile);
+    void saveGeneratorProfile(Long userId, GeneratorProfile profile);
 }

@@ -1,7 +1,6 @@
 package ru.matthew.NauJava.service;
 
 import ru.matthew.NauJava.entity.PasswordEntry;
-import ru.matthew.NauJava.entity.ServiceEntry;
 import ru.matthew.NauJava.entity.User;
 
 import java.util.List;
@@ -15,10 +14,10 @@ public interface PasswordEntryService {
      * @param login       логин пользователя для сервиса
      * @param password    пароль для доступа к сервису
      * @param description дополнительное описание записи
-     * @param serviceEntryName Объект типа {@link ServiceEntry}  содержащий информацию о сервисе
+     * @param serviceName наименование сервиса
      * @param user        Объект типа {@link User} содержащий информацию о пользователе
      */
-    void createPasswordEntry(String login, String password, String description, ServiceEntry serviceEntryName, User user);
+    void createPasswordEntry(String login, String password, String description, String serviceName, User user);
 
     /**
      * Находит запись пароля по её уникальному идентификатору
@@ -69,7 +68,7 @@ public interface PasswordEntryService {
      * Обновляет логин для существующей записи
      *
      * @param id       уникальный идентификатор записи
-     * @param newLogin
+     * @param newLogin новый логин
      */
     void updateLogin(Long id, String newLogin);
 

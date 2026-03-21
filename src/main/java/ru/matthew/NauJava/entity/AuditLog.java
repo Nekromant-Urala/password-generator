@@ -14,7 +14,8 @@ public class AuditLog {
     private Long id;
 
     @Column(name = "event_type")
-    private String eventType;
+    @Enumerated(EnumType.STRING)
+    private EventType eventType;
 
     @Column(name = "event_description")
     private String eventDescription;
@@ -41,11 +42,11 @@ public class AuditLog {
         this.id = id;
     }
 
-    public String getEventType() {
+    public EventType getEventType() {
         return eventType;
     }
 
-    public void setEventType(String eventType) {
+    public void setEventType(EventType eventType) {
         this.eventType = eventType;
     }
 

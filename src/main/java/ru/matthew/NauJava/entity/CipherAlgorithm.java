@@ -31,9 +31,6 @@ public class CipherAlgorithm {
     @Column(name = "is_authenticated")
     private boolean isAuthenticated;
 
-    @OneToMany(mappedBy = "cipher")
-    private List<GeneratorProfile> profiles;
-
     public Long getId() {
         return id;
     }
