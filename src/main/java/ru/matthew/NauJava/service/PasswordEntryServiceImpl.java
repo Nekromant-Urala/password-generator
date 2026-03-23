@@ -1,103 +1,107 @@
 package ru.matthew.NauJava.service;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.matthew.NauJava.config.Config;
-import ru.matthew.NauJava.dao.PasswordEntryDaoImpl;
-import ru.matthew.NauJava.entity.PasswordEntry;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import org.springframework.transaction.annotation.Transactional;
+import ru.matthew.NauJava.entity.PasswordEntry;
+import ru.matthew.NauJava.entity.User;
+import ru.matthew.NauJava.exception.PasswordEntryNotFoundException;
+import ru.matthew.NauJava.repository.PasswordEntryRepository;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PasswordEntryServiceImpl implements PasswordEntryService {
 
-    private final Config config;
-    private final PasswordEntryDaoImpl passwordEntryDao;
+    private final PasswordEntryRepository passwordEntryRepository;
 
-    private static final String DATA_FORMATTER = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-    private static final String APP_NAME_MSG = "%s  INFO Текущее название приложения: %s\n";
-    private static final String VERSION_MSG = "%s  INFO Текущая версия приложения: %s\n";
+    private static final String NOT_FOUND_ENTRY = "Не удалось найти запись с таким id: ";
 
     @Autowired
-    public PasswordEntryServiceImpl(PasswordEntryDaoImpl passwordEntryDao, Config config) {
-        this.passwordEntryDao = passwordEntryDao;
-        this.config = config;
+    public PasswordEntryServiceImpl(PasswordEntryRepository passwordEntryRepository) {
+        this.passwordEntryRepository = passwordEntryRepository;
     }
 
-    @PostConstruct
-    public void init() {
-        ZonedDateTime now = ZonedDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_FORMATTER);
-        String formattedDate = now.format(formatter);
-        System.out.printf(APP_NAME_MSG, formattedDate, config.getAppName());
-        System.out.printf(VERSION_MSG, formattedDate, config.getVersion());
-    }
 
     @Override
-    public void createPasswordEntry(Long id, String login, String password, String serviceName, String description) {
+    @Transactional
+    public void createPasswordEntry(String login, String password, String description, String serviceName, User user) {
         var passwordEntry = new PasswordEntry();
-        passwordEntry.setId(id);
         passwordEntry.setLogin(login);
         passwordEntry.setPassword(password);
-        passwordEntry.setServiceName(serviceName);
         passwordEntry.setDescription(description);
-        passwordEntryDao.save(passwordEntry);
+        passwordEntry.setServiceName(serviceName);
+        passwordEntry.setUser(user);
+
+        passwordEntryRepository.save(passwordEntry);
     }
 
     @Override
-    public PasswordEntry findById(Long id) {
-        return passwordEntryDao.findById(id);
+    public Optional<PasswordEntry> findById(Long id) {
+        return passwordEntryRepository.findById(id);
     }
 
     @Override
     public List<PasswordEntry> findByServiceName(String serviceName) {
-        return passwordEntryDao.findByServiceName(serviceName);
+        return passwordEntryRepository.findByServiceName(serviceName);
     }
 
     @Override
     public List<PasswordEntry> findAll() {
-        return passwordEntryDao.findAll();
+        return passwordEntryRepository.findAll();
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
-        passwordEntryDao.deleteById(id);
+        passwordEntryRepository.deleteById(id);
     }
 
     @Override
+    @Transactional
     public void deleteByServiceName(String serviceName) {
-        passwordEntryDao.deleteByServiceName(serviceName);
+        passwordEntryRepository.deleteByServiceName(serviceName);
     }
 
     @Override
+    @Transactional
     public void updatePassword(Long id, String newPassword) {
-        var passwordEntry = passwordEntryDao.findById(id);
+        var passwordEntry = passwordEntryRepository.findById(id).orElseThrow(
+                () -> new PasswordEntryNotFoundException(NOT_FOUND_ENTRY + id)
+        );
         passwordEntry.setPassword(newPassword);
-        passwordEntryDao.update(passwordEntry);
+        passwordEntryRepository.save(passwordEntry);
     }
 
     @Override
+    @Transactional
     public void updateLogin(Long id, String newLogin) {
-        var passwordEntry = passwordEntryDao.findById(id);
+        var passwordEntry = passwordEntryRepository.findById(id).orElseThrow(
+                () -> new PasswordEntryNotFoundException(NOT_FOUND_ENTRY + id)
+        );
         passwordEntry.setLogin(newLogin);
-        passwordEntryDao.update(passwordEntry);
+        passwordEntryRepository.save(passwordEntry);
     }
 
     @Override
+    @Transactional
     public void updateServiceName(Long id, String newServiceName) {
-        var passwordEntry = passwordEntryDao.findById(id);
+        var passwordEntry = passwordEntryRepository.findById(id).orElseThrow(
+                () -> new PasswordEntryNotFoundException(NOT_FOUND_ENTRY + id)
+        );
         passwordEntry.setServiceName(newServiceName);
-        passwordEntryDao.update(passwordEntry);
+        passwordEntryRepository.save(passwordEntry);
     }
 
     @Override
+    @Transactional
     public void updateDescription(Long id, String newDescription) {
-        var passwordEntry = passwordEntryDao.findById(id);
+        var passwordEntry = passwordEntryRepository.findById(id).orElseThrow(
+                () -> new PasswordEntryNotFoundException(NOT_FOUND_ENTRY + id)
+        );
         passwordEntry.setDescription(newDescription);
-        passwordEntryDao.update(passwordEntry);
+        passwordEntryRepository.save(passwordEntry);
     }
 }
