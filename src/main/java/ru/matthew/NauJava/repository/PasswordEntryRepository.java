@@ -1,13 +1,17 @@
 package ru.matthew.NauJava.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
 import ru.matthew.NauJava.entity.PasswordEntry;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@RepositoryRestResource(path = "passwords")
 public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Long> {
 
     /**
@@ -24,6 +28,8 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      *
      * @param serviceName наименование сервиса
      */
+    @Modifying
+    @Query("DELETE FROM PasswordEntry e WHERE e.serviceName = :serviceName")
     void deleteByServiceName(String serviceName);
 
 

@@ -12,7 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.matthew.NauJava.entity.AuditLog;
 import ru.matthew.NauJava.entity.GeneratorProfile;
 import ru.matthew.NauJava.entity.User;
-import ru.matthew.NauJava.exception.UserNotFoundException;
+import ru.matthew.NauJava.repository.exception.UserNotFoundException;
 import ru.matthew.NauJava.repository.AuditLogRepository;
 import ru.matthew.NauJava.repository.GeneratorProfileRepository;
 import ru.matthew.NauJava.repository.UserRepository;

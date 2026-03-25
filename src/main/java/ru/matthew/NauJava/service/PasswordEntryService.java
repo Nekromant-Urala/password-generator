@@ -3,6 +3,7 @@ package ru.matthew.NauJava.service;
 import ru.matthew.NauJava.entity.PasswordEntry;
 import ru.matthew.NauJava.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,15 @@ public interface PasswordEntryService {
      * @param user        Объект типа {@link User} содержащий информацию о пользователе
      */
     void createPasswordEntry(String login, String password, String description, String serviceName, User user);
+
+    /**
+     * Выполняет поиск записей паролей, которые были сгенерированы за определенный промежуток времени
+     *
+     * @param startDate начальная дата временного промежутка для поиска
+     * @param endDate   конечная дата временного промежутка для поиска
+     * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
+     */
+    List<PasswordEntry> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     /**
      * Находит запись пароля по её уникальному идентификатору

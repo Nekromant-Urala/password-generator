@@ -36,5 +36,6 @@ mvnw.cmd
 # Log file
 *.log
 
-### Other Files ###
+### Other Files & Dir ###
 .gitattributes
+src/main/resources/sql
