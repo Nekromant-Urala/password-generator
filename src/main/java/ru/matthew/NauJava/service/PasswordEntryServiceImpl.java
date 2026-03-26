@@ -6,9 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.matthew.NauJava.entity.PasswordEntry;
 import ru.matthew.NauJava.entity.User;
-import ru.matthew.NauJava.exception.PasswordEntryNotFoundException;
+import ru.matthew.NauJava.repository.exception.PasswordEntryNotFoundException;
 import ru.matthew.NauJava.repository.PasswordEntryRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,16 +40,25 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<PasswordEntry> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate) {
+        return passwordEntryRepository.findByCreatedAtBetween(startDate, endDate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<PasswordEntry> findById(Long id) {
         return passwordEntryRepository.findById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PasswordEntry> findByServiceName(String serviceName) {
         return passwordEntryRepository.findByServiceName(serviceName);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<PasswordEntry> findAll() {
         return passwordEntryRepository.findAll();
     }

@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.exception;
+package ru.matthew.NauJava.repository.exception;
 
 public class PasswordEntryNotFoundException extends RuntimeException {
     public PasswordEntryNotFoundException(String message) {
