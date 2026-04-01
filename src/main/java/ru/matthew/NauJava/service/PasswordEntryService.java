@@ -46,6 +46,14 @@ public interface PasswordEntryService {
     List<PasswordEntry> findByServiceName(String serviceName);
 
     /**
+     * Выполняет поиск всех записей для конкретного пользователя
+     *
+     * @param username имя пользователь чьи записи нужно найти
+     * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
+     */
+    List<PasswordEntry> findByUsername(String username);
+
+    /**
      * Возвращает список всех записей паролей в хранилище.
      *
      * @return список всех записей-паролей

@@ -1,6 +1,8 @@
 package ru.matthew.NauJava.controller.mvc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +25,10 @@ public class PasswordEntryViewController {
     }
 
     @GetMapping("/entries")
-    public String passwordEntryView(Model model) {
-        List<PasswordEntry> entries = passwordEntryService.findAll();
+    public String passwordEntryView(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        List<PasswordEntry> entries = passwordEntryService.findByUsername(username);
         model.addAttribute("passwords", entries);
-        return "password/password_entry";
+        return "user/password/entries";
     }
 }
