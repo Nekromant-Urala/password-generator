@@ -1,11 +1,13 @@
 package ru.matthew.NauJava.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 import ru.matthew.NauJava.entity.PasswordEntry;
 import ru.matthew.NauJava.entity.User;
+import ru.matthew.NauJava.repository.UserRepository;
 import ru.matthew.NauJava.repository.exception.PasswordEntryNotFoundException;
 import ru.matthew.NauJava.repository.PasswordEntryRepository;
 
@@ -17,13 +19,17 @@ import java.util.Optional;
 public class PasswordEntryServiceImpl implements PasswordEntryService {
 
     private final PasswordEntryRepository passwordEntryRepository;
+    private final UserRepository userRepository;
 
     private static final String NOT_FOUND_ENTRY = "Не удалось найти запись с таким id: ";
+    private static final String NOT_FOUND_USER = "Не удалось найти пользователя: ";
 
     @Autowired
-    public PasswordEntryServiceImpl(PasswordEntryRepository passwordEntryRepository) {
+    public PasswordEntryServiceImpl(PasswordEntryRepository passwordEntryRepository, UserRepository userRepository) {
         this.passwordEntryRepository = passwordEntryRepository;
+        this.userRepository = userRepository;
     }
+
 
 
     @Override
@@ -55,6 +61,15 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     @Transactional(readOnly = true)
     public List<PasswordEntry> findByServiceName(String serviceName) {
         return passwordEntryRepository.findByServiceName(serviceName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PasswordEntry> findByUsername(String username) {
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException(NOT_FOUND_USER + username));
+
+        return passwordEntryRepository.findByUser(user);
     }
 
     @Override

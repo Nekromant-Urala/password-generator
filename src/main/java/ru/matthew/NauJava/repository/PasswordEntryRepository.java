@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import ru.matthew.NauJava.entity.PasswordEntry;
+import ru.matthew.NauJava.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,14 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
     List<PasswordEntry> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     /**
+     * Выполняет поиск всех записей для конкретного пользователя
+     *
+     * @param user пользователь чьи записи нужно найти
+     * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
+     */
+    List<PasswordEntry> findByUser(User user);
+
+    /**
      * Удаление записей паролей по определенному названия сервиса
      *
      * @param serviceName наименование сервиса
@@ -31,7 +40,6 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
     @Modifying
     @Query("DELETE FROM PasswordEntry e WHERE e.serviceName = :serviceName")
     void deleteByServiceName(String serviceName);
-
 
     /**
      * Выполняет поиск записей паролей, которые были созданы для какого-то конкретного сервиса

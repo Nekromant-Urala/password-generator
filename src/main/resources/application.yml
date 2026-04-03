@@ -2,6 +2,9 @@ spring:
   application:
     name: NauJava
 
+  main:
+    allow-bean-definition-overriding: true
+
   messages:
     encoding: UTF-8
 
@@ -10,6 +13,7 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
 
   jpa:
     properties:
@@ -20,6 +24,9 @@ spring:
         highlight_sql: true
         hbm2ddl:
           auto: update
+  data:
+    rest:
+      base-path: /api
 
 management:
   endpoints:

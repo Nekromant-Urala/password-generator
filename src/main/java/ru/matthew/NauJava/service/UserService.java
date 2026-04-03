@@ -1,14 +1,10 @@
-package ru.matthew.NauJava.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+package ru.matthew.NauJava.service;
 
 import ru.matthew.NauJava.entity.User;
 
 import java.util.Optional;
 
-@RepositoryRestResource(path = "users")
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserService {
 
     /**
      * Ищет пользователя по его имени
@@ -17,4 +13,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return {@link Optional} с найденным пользователем, или {@link Optional#empty()}, если пользователь не найден
      */
     Optional<User> findByUsername(String username);
+
+    /**
+     * Создает нового пользователя в системе.
+     *
+     * @param user пользователй, которого необходимо сохранить
+     * @return созданный объект {@link User}
+     */
+    User createUser(User user);
 }
