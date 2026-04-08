@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.service;
+package ru.matthew.NauJava.service.profile;
 
 import ru.matthew.NauJava.entity.GeneratorProfile;
 

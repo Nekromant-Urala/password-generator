@@ -1,10 +1,11 @@
-package ru.matthew.NauJava.service;
+package ru.matthew.NauJava.service.profile;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import ru.matthew.NauJava.entity.AuditLog;
@@ -40,6 +41,7 @@ public class GeneratorProfileServiceImpl implements GeneratorProfileService {
     }
 
     @Override
+    @Transactional
     public void saveGeneratorProfile(Long userId, GeneratorProfile profile) {
         TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
         try {

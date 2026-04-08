@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.service;
+package ru.matthew.NauJava.service.passwordEntry;
 
 import ru.matthew.NauJava.entity.PasswordEntry;
 import ru.matthew.NauJava.entity.User;

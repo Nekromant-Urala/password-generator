@@ -19,6 +19,7 @@ import ru.matthew.NauJava.repository.exception.UserNotFoundException;
 import ru.matthew.NauJava.repository.AuditLogRepository;
 import ru.matthew.NauJava.repository.GeneratorProfileRepository;
 import ru.matthew.NauJava.repository.UserRepository;
+import ru.matthew.NauJava.service.profile.GeneratorProfileServiceImpl;
 
 import java.util.Optional;
 

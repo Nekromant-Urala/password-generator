@@ -21,9 +21,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
+        http.csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/**", "/reports/**"))
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/registration").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/**").hasAuthority(ADMIN.getAuthority())
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/**", "/reports/**").hasAuthority(ADMIN.getAuthority())
                         .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage("/login")

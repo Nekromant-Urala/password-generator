@@ -14,7 +14,6 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
-
   jpa:
     properties:
       hibernate:
@@ -42,4 +41,3 @@ app:
   message:
     name: "%s  INFO Текущее название приложения: %s\n"
     version: "%s  INFO Текущая версия приложения: %s\n"
-
