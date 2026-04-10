@@ -1,8 +1,11 @@
-package ru.matthew.NauJava.service.order;
+package ru.matthew.NauJava.service.report;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import ru.matthew.NauJava.entity.PasswordEntry;
 import ru.matthew.NauJava.entity.Report;
@@ -23,17 +26,19 @@ public class ReportServiceImpl implements ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
     private final PasswordEntryRepository passwordRepository;
+    private final TemplateEngine templateEngine;
 
     @Autowired
-    public ReportServiceImpl(ReportRepository reportRepository, UserRepository userRepository, PasswordEntryRepository passwordRepository) {
+    public ReportServiceImpl(ReportRepository reportRepository, UserRepository userRepository, PasswordEntryRepository passwordRepository, TemplateEngine templateEngine) {
         this.reportRepository = reportRepository;
         this.userRepository = userRepository;
         this.passwordRepository = passwordRepository;
+        this.templateEngine = templateEngine;
     }
 
     @Override
     @Transactional
-    public Long generateOrderAsync() {
+    public Long generateReportAsync() {
         Report report = new Report();
         report.setStatus(ReportStatus.GENERATED);
         report = reportRepository.save(report);
@@ -68,7 +73,7 @@ public class ReportServiceImpl implements ReportService {
 
                 long totalTime = System.currentTimeMillis() - totalStartTime;
 
-                String htmlReport = buildHtmlReport(userCount[0], userTime[0], entriesList, listTime[0], totalTime);
+                String htmlReport = buildHtmlTableReport(userCount[0], userTime[0], entriesList, listTime[0], totalTime);
 
                 Report finishedReport = reportRepository.findById(reportId).orElseThrow(
                         () -> new NotFoundReportException("Отчет не найден")
@@ -96,28 +101,14 @@ public class ReportServiceImpl implements ReportService {
         );
     }
 
-    private String buildHtmlReport(long userCount, long userTime, List<PasswordEntry> entries, long listTime, long totalTime) {
-        StringBuilder html = new StringBuilder();
-        html.append("<table border='1' cellspacing='0' cellpadding='5'>");
-        html.append("<tr><th>Метрика</th><th>Значение</th><th>Затраченное время (мс)</th></tr>");
-        html.append("<tr><td>Количество пользователей</td><td>").append(userCount).append("</td><td>").append(userTime).append("</td></tr>");
-        html.append("<tr><td>Количество записей</td><td>").append(entries.size()).append("</td><td>").append(listTime).append("</td></tr>");
-        html.append("<tr><td><b>Общее время</b></td><td>-</td><td><b>").append(totalTime).append("</b></td></tr>");
-        html.append("</table>");
+    private String buildHtmlTableReport(long userCount, long userTime, List<PasswordEntry> entries, long listTime, long totalTime) {
+        Context ctx = new Context();
+        ctx.setVariable("userCount", userCount);
+        ctx.setVariable("userTime", userTime);
+        ctx.setVariable("entries", entries);
+        ctx.setVariable("listTime", listTime);
+        ctx.setVariable("totalTime", totalTime);
 
-        html.append("<h3>Список информации о паролях</h3>");
-        html.append("<table border='1' cellspacing='0' cellpadding='5'>");
-        html.append("<tr><th>ID</th><th>Название сервиса</th><th>Описание</th></tr>");
-
-        for (var entry : entries) {
-            html.append("<tr>");
-            html.append("<td>").append(entry.getId()).append("</td>");
-            html.append("<td>").append(entry.getServiceName()).append("</td>");
-            html.append("<td>").append(entry.getDescription()).append("</td>");
-            html.append("</tr>");
-        }
-
-        html.append("</table></body></html>");
-        return html.toString();
+        return templateEngine.process("details\\report-table.html", ctx);
     }
 }

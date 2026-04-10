@@ -1,0 +1,36 @@
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr>
+        <th>Метрика</th>
+        <th>Значение</th>
+        <th>Затраченное время (мс)</th>
+    </tr>
+    <tr>
+        <td>Количество пользователей</td>
+        <td th:text="${userCount}"></td>
+        <td th:text="${userTime}"></td>
+    </tr>
+    <tr>
+        <td>Количество записей</td>
+        <td th:text="${entries.size()}"></td>
+        <td th:text="${listTime}"></td>
+    </tr>
+    <tr>
+        <td><b>Общее время</b></td>
+        <td>-</td>
+        <td><b th:text="${totalTime}"></b></td>
+    </tr>
+</table>
+
+<h3>Список информации о паролях</h3>
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr>
+        <th>ID</th>
+        <th>Название сервиса</th>
+        <th>Описание</th>
+    </tr>
+    <tr th:each="entry : ${entries}">
+        <td th:text="${entry.id}"></td>
+        <td th:text="${entry.serviceName}"></td>
+        <td th:text="${entry.description}"></td>
+    </tr>
+</table>

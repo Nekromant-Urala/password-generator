@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import ru.matthew.NauJava.entity.Report;
 
-import ru.matthew.NauJava.service.order.ReportService;
+import ru.matthew.NauJava.service.report.ReportService;
 
 @RestController
 @RequestMapping("/reports")
@@ -20,8 +20,8 @@ public class ReportRestController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<Long> generateOrder() {
-        Long reportId = reportService.generateOrderAsync();
+    public ResponseEntity<Long> generateReport() {
+        Long reportId = reportService.generateReportAsync();
         return ResponseEntity.ok(reportId);
     }
 

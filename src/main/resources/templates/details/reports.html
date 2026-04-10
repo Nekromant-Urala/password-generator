@@ -8,7 +8,7 @@
 <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
     <form th:action="@{/reports/view/details}" method="get">
         <label>
-            <input type="text" name="id" th:value="${searchedId}" placeholder="Задайте id отчета" required />
+            <input type="text" name="id" th:value="${searchedId}" placeholder="Задайте id отчета" required/>
         </label>
         <button type="submit">Найти</button>
     </form>
@@ -25,7 +25,7 @@
 <div th:if="${report != null}">
     <h3>Статус отчета: <span th:text="${report.status}"></span></h3>
 
-    <div th:if="${report.description != null}" th:utext="${report.description}"></div>
+    <div th:if="${report.status.name() == 'COMPLETED'}" th:utext="${report.description}"></div>
 
     <p th:if="${report.status.name() == 'GENERATED'}">
         Отчет еще формируется, обновите страницу чуть позже.

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import ru.matthew.NauJava.entity.Report;
 import ru.matthew.NauJava.repository.exception.NotFoundReportException;
-import ru.matthew.NauJava.service.order.ReportService;
+import ru.matthew.NauJava.service.report.ReportService;
 
 @Controller
 @RequestMapping("reports/view")
@@ -29,7 +29,7 @@ public class ReportViewController {
 
     @PostMapping("/create")
     public String createReport(Model model) {
-        Long reportId = reportService.generateOrderAsync();
+        Long reportId = reportService.generateReportAsync();
         model.addAttribute("message", "Запущена генерация отчета. ID вашего отчета: " + reportId);
         return "details/reports";
     }

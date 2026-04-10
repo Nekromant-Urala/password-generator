@@ -21,7 +21,7 @@ public class ControllerExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundReportException.class)
-    public ErrorResponse handleNotFoundOrder(NotFoundReportException exception) {
+    public ErrorResponse handleNotFoundReport(NotFoundReportException exception) {
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
     }
 

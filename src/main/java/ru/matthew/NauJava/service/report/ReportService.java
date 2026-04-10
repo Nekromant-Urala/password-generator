@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.service.order;
+package ru.matthew.NauJava.service.report;
 
 import ru.matthew.NauJava.entity.Report;
 
@@ -12,15 +12,14 @@ public interface ReportService {
      *
      * @return Возвращает id объекта созданного в базе данных
      */
-    Long generateOrderAsync();
+    Long generateReportAsync();
 
 
     /**
      * Ищет отчет по его id
      *
      * @param id уникальный идентификатор отчета
-     * @return {@link Optional} с найденным отчетом, или {@link Optional#empty()}, если отчет не найден
+     * @return найденный отчет типа {@link Report}
      */
-    //TODO поправить java-doc
     Report findById(Long id);
 }
