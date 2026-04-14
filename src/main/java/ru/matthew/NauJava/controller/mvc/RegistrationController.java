@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.matthew.NauJava.entity.User;
 import ru.matthew.NauJava.repository.exception.UserExistsException;
-import ru.matthew.NauJava.service.UserService;
+import ru.matthew.NauJava.service.user.UserService;
 
 @Controller
 public class RegistrationController {

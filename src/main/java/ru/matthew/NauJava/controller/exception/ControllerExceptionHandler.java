@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import ru.matthew.NauJava.repository.exception.NotFoundReportException;
 import ru.matthew.NauJava.repository.exception.PasswordEntryNotFoundException;
 
 @ControllerAdvice
@@ -14,6 +15,13 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(PasswordEntryNotFoundException.class)
     public ErrorResponse handleNotFoundPasswordEntry(PasswordEntryNotFoundException exception) {
+        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundReportException.class)
+    public ErrorResponse handleNotFoundReport(NotFoundReportException exception) {
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
     }
 

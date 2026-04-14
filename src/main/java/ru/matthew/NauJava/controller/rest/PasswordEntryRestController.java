@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import ru.matthew.NauJava.entity.PasswordEntry;
-import ru.matthew.NauJava.service.PasswordEntryService;
+import ru.matthew.NauJava.service.passwordEntry.PasswordEntryService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

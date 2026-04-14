@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.service;
+package ru.matthew.NauJava.service.passwordEntry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

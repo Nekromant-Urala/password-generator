@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.service;
+package ru.matthew.NauJava.service.user;
 
 import ru.matthew.NauJava.entity.User;
 

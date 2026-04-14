@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import ru.matthew.NauJava.entity.PasswordEntry;
-import ru.matthew.NauJava.service.PasswordEntryService;
+import ru.matthew.NauJava.service.passwordEntry.PasswordEntryService;
 
 import java.util.List;
 
