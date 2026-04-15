@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.service.integration;
+package ru.matthew.NauJava.service.profile.integration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

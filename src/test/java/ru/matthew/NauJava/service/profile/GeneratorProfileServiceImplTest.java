@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.service;
+package ru.matthew.NauJava.service.profile;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,6 @@ import ru.matthew.NauJava.repository.exception.UserNotFoundException;
 import ru.matthew.NauJava.repository.AuditLogRepository;
 import ru.matthew.NauJava.repository.GeneratorProfileRepository;
 import ru.matthew.NauJava.repository.UserRepository;
-import ru.matthew.NauJava.service.profile.GeneratorProfileServiceImpl;
 
 import java.util.Optional;
 
@@ -79,7 +78,7 @@ public class GeneratorProfileServiceImplTest {
     }
 
     @Test
-    @DisplayName("отсутвие пользователя при поиске и соотевтсующее выбрасывание ошибки")
+    @DisplayName("отсутствие пользователя при поиске и соответствующее выбрасывание ошибки")
     void testSaveGeneratorProfile_UserNotFound_ThrowsException() {
 
         when(transactionManager.getTransaction(any())).thenReturn(status);
