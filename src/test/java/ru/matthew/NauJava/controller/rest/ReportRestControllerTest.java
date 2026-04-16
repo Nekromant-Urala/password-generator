@@ -72,7 +72,7 @@ public class ReportRestControllerTest {
 
     @Test
     @WithMockUser(authorities = "ADMIN")
-    public void testGetReportContent_InvalidFormat_NotDigits() throws Exception {
+    public void testGetReportContent_InvalidFormat() throws Exception {
         String noDigits = "test";
         mockMvc.perform(get(GET_URL + noDigits).with(csrf())).andExpect(status().isNotFound());
     }
