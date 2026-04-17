@@ -25,7 +25,7 @@ public class ReportRestController {
         return ResponseEntity.ok(reportId);
     }
 
-    @GetMapping("/{id:\\d}")
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<Report> getReportContent(@PathVariable Long id) {
         Report report = reportService.findById(id);
         return ResponseEntity.ok(report);

@@ -2,8 +2,6 @@ package ru.matthew.NauJava.service.report;
 
 import ru.matthew.NauJava.entity.Report;
 
-import java.util.Optional;
-
 
 public interface ReportService {
 
