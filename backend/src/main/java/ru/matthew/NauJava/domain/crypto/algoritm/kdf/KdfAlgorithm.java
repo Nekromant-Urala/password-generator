@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.domain.algoritm.kdf;
+package ru.matthew.NauJava.domain.crypto.algoritm.kdf;
 
 import jakarta.persistence.*;
 

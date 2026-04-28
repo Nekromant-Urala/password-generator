@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.domain.algoritm.cipher;
+package ru.matthew.NauJava.domain.crypto.algoritm.cipher;
 
 import jakarta.persistence.*;
 

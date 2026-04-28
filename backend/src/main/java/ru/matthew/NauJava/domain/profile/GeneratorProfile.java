@@ -1,8 +1,8 @@
 package ru.matthew.NauJava.domain.profile;
 
 import jakarta.persistence.*;
-import ru.matthew.NauJava.domain.algoritm.cipher.CipherAlgorithm;
-import ru.matthew.NauJava.domain.algoritm.kdf.KdfAlgorithm;
+import ru.matthew.NauJava.domain.crypto.algoritm.cipher.CipherAlgorithm;
+import ru.matthew.NauJava.domain.crypto.algoritm.kdf.KdfAlgorithm;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -174,23 +174,4 @@ public class GeneratorProfile {
         this.cipher = cipher;
     }
 
-    @Override
-    public String toString() {
-        return "GeneratorProfile{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", passwordLength=" + passwordLength +
-                ", isUppercase=" + isUppercase +
-                ", isLowercase=" + isLowercase +
-                ", isDigits=" + isDigits +
-                ", isSpecialChars=" + isSpecialChars +
-                ", isAvoidAmbiguousChars=" + isAvoidAmbiguousChars +
-                ", isFavorite=" + isFavorite +
-                ", customChars='" + customChars + '\'' +
-                ", createAt=" + createAt +
-                ", user=" + user +
-                ", kdfAlgorithm=" + kdfAlgorithm +
-                ", cipher=" + cipher +
-                '}';
-    }
 }
