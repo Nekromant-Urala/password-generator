@@ -13,9 +13,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.springframework.test.context.jdbc.Sql;
-import ru.matthew.NauJava.entity.Report;
-import ru.matthew.NauJava.repository.exception.NotFoundReportException;
-import ru.matthew.NauJava.service.report.ReportService;
+import ru.matthew.NauJava.domain.report.Report;
+import ru.matthew.NauJava.domain.report.exception.NotFoundReportException;
+import ru.matthew.NauJava.domain.report.ReportService;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;

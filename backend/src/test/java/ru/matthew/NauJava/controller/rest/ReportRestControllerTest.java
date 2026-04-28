@@ -10,8 +10,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import org.springframework.test.web.servlet.MockMvc;
 import ru.matthew.NauJava.config.SecurityConfig;
-import ru.matthew.NauJava.entity.Report;
-import ru.matthew.NauJava.service.report.ReportService;
+import ru.matthew.NauJava.domain.report.Report;
+import ru.matthew.NauJava.domain.report.ReportRestController;
+import ru.matthew.NauJava.domain.report.ReportService;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;

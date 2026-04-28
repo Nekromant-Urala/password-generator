@@ -12,13 +12,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 
-import ru.matthew.NauJava.entity.AuditLog;
-import ru.matthew.NauJava.entity.GeneratorProfile;
-import ru.matthew.NauJava.entity.User;
-import ru.matthew.NauJava.repository.exception.UserNotFoundException;
-import ru.matthew.NauJava.repository.AuditLogRepository;
-import ru.matthew.NauJava.repository.GeneratorProfileRepository;
-import ru.matthew.NauJava.repository.UserRepository;
+import ru.matthew.NauJava.domain.audit.AuditLog;
+import ru.matthew.NauJava.domain.profile.GeneratorProfile;
+import ru.matthew.NauJava.domain.profile.GeneratorProfileServiceImpl;
+import ru.matthew.NauJava.domain.user.User;
+import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
+import ru.matthew.NauJava.domain.audit.AuditLogRepository;
+import ru.matthew.NauJava.domain.profile.GeneratorProfileRepository;
+import ru.matthew.NauJava.domain.user.UserRepository;
 
 import java.util.Optional;
 

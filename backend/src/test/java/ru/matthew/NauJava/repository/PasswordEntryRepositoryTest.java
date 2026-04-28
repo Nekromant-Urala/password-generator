@@ -10,7 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import ru.matthew.NauJava.entity.PasswordEntry;
+import ru.matthew.NauJava.domain.password.PasswordEntry;
+import ru.matthew.NauJava.domain.password.PasswordEntryRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
