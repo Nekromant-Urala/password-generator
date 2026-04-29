@@ -8,6 +8,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сущность пользователя системы.
+ * Содержит учетные данные и управляет связями с профилями и записями паролей.
+ */
 @Entity
 @Table(name = "users")
 public class User {
@@ -52,12 +56,12 @@ public class User {
         passwordEntry.setUser(null);
     }
 
-    public void addProfile(GeneratorProfile profile){
+    public void addProfile(GeneratorProfile profile) {
         profiles.add(profile);
         profile.setUser(this);
     }
 
-    public void removeProfile(GeneratorProfile profile){
+    public void removeProfile(GeneratorProfile profile) {
         profiles.remove(profile);
         profile.setUser(null);
     }

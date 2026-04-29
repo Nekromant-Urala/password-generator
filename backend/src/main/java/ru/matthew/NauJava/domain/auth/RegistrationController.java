@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import ru.matthew.NauJava.domain.user.User;
-import ru.matthew.NauJava.domain.user.exception.UserExistsException;
+import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.UserService;
 
 @Controller
@@ -34,7 +34,7 @@ public class RegistrationController {
         try {
             userService.createUser(user);
             return "redirect:/login";
-        } catch (UserExistsException e) {
+        } catch (UserAlreadyExistsException e) {
             model.addAttribute("message", "Пользователь уже существует");
             return "user/registration";
         }
