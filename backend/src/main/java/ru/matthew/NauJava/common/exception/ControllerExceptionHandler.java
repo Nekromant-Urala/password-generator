@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ru.matthew.NauJava.domain.report.exception.NotFoundReportException;
+import ru.matthew.NauJava.domain.report.exception.ReportNotFoundException;
 import ru.matthew.NauJava.domain.password.exception.PasswordEntryNotFoundException;
 
 @ControllerAdvice
@@ -21,8 +21,8 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NotFoundReportException.class)
-    public ErrorResponse handleNotFoundReport(NotFoundReportException exception) {
+    @ExceptionHandler(ReportNotFoundException.class)
+    public ErrorResponse handleNotFoundReport(ReportNotFoundException exception) {
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
     }
 
