@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.domain.crypto.algoritm.kdf;
+package ru.matthew.NauJava.domain.crypto.algorithm.kdf;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
