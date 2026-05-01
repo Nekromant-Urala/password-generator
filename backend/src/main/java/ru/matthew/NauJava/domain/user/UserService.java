@@ -1,5 +1,7 @@
 package ru.matthew.NauJava.domain.user;
 
+import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
+import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
@@ -16,9 +18,9 @@ public interface UserService {
      * Регистрация нового пользователя в системе.
      * Выполняет хеширование пароля и назначает роль по умолчанию.
      *
-     * @param userDto данные для создания пользователя.
+     * @param userDto объект передачи данных (DTO), содержащий информацию для создания пользователя.
      * @return Возвращает объект {@link UserResponseDto} с данными созданного пользователя.
-     * @throws {@link UserAlreadyExistsException} если пользователь с таким email или username уже существует.
+     * @throws {@link UserAlreadyExistsException} если такой пользователь уже существует.
      */
     UserResponseDto createUser(UserCreateDto userDto);
 
@@ -26,30 +28,33 @@ public interface UserService {
      * Нахождение пользователя по уникальному идентификатору.
      *
      * @param id уникальный идентификатор пользователя.
-     * @return {@link Optional}, содержащий DTO пользователя, или пустой, если пользователь не найден.
+     * @return Возвращает объект {@link UserResponseDto} с данными найденного пользователя.
+     * @throws {@link UserNotFoundException} если пользователь с заданным id не существует.
      */
-    Optional<UserResponseDto> findById(Long id);
+    UserResponseDto findById(Long id);
 
     /**
      * Нахождение пользователя по его имени (username).
      *
      * @param username имя пользователя.
-     * @return {@link Optional}, содержащий DTO пользователя, или пустой, если пользователь не найден.
+     * @return Возвращает объект {@link UserResponseDto} с данными найденного пользователя.
+     * @throws {@link UserNotFoundException} если пользователь с заданным username не существует.
      */
-    Optional<UserResponseDto> findByUsername(String username);
+    UserResponseDto findByUsername(String username);
 
     /**
      * Нахождения пользователя по почте (email).
      *
      * @param email адрес электронной почты пользователя.
-     * @return {@link Optional}, содержащий DTO пользователя, или пустой, если пользователь не найден.
+     * @return Возвращает объект {@link UserResponseDto} с данными найденного пользователя.
+     * @throws {@link UserNotFoundException} если пользователь с таким email не существует.
      */
-    Optional<UserResponseDto> findByEmail(String email);
+    UserResponseDto findByEmail(String email);
 
     /**
      * Получение списка всех зарегистрированных пользователей.
      *
-     * @return список {@link UserResponseDto}
+     * @return Список всех пользователей объектов {@link UserResponseDto}
      */
     List<UserResponseDto> findAll();
 
@@ -58,27 +63,30 @@ public interface UserService {
      *
      * @param id    уникальный идентификатор пользователя.
      * @param email новый адрес электронной почты.
-     * @throws {@link UserNotFoundException} если пользователь с таким email или username уже существует.
+     * @return Возвращает объект {@link UserResponseDto} с данными измененного пользователя.
+     * @throws {@link UserNotFoundException} если пользователь с заданным id не существует.
      */
-    void updateEmail(Long id, String email);
+    UserResponseDto updateEmail(Long id, String email);
 
     /**
      * Изменяет имя пользователя (username).
      *
      * @param id       уникальный идентификатор пользователя.
      * @param username новое имя пользователя
-     * @throws {@link UserNotFoundException} если пользователь с таким email или username уже существует.
+     * @return Возвращает объект {@link UserResponseDto} с данными измененного пользователя.
+     * @throws @throws {@link UserNotFoundException} если пользователь с заданным id не существует.
      */
-    void updateUsername(Long id, String username);
+    UserResponseDto updateUsername(Long id, String username);
 
     /**
      * Устанавливает новый пароль для пользователя.
      *
      * @param id       уникальный идентификатор пользователя.
      * @param password новый пароль
-     * @throws {@link UserNotFoundException} если пользователь с таким email или username уже существует.
+     * @return Возвращает объект {@link UserResponseDto} с данными измененного пользователя.
+     * @throws @throws {@link UserNotFoundException} если пользователь с заданным id не существует.
      */
-    void updatePassword(Long id, char[] password);
+    UserResponseDto updatePassword(Long id, char[] password);
 
     /**
      * Удаляет пользователя и все связанные с ним данные из системы.
