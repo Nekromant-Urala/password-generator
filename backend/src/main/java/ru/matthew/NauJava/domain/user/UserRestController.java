@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -56,8 +57,12 @@ public class UserRestController {
 
     @PutMapping("/update/password/{id}")
     public ResponseEntity<UserResponseDto> updatePassword(@PathVariable Long id, @RequestBody char[] password) {
-        var dto = userService.updatePassword(id, password);
-        return ResponseEntity.ok(dto);
+        try {
+            var dto = userService.updatePassword(id, password);
+            return ResponseEntity.ok(dto);
+        } finally {
+            Arrays.fill(password, '\0');
+        }
     }
 
     @DeleteMapping("/{id}")
