@@ -1,6 +1,7 @@
 package ru.matthew.NauJava.domain.password;
 
 import ru.matthew.NauJava.domain.password.dto.PasswordEntryCreateDto;
+import ru.matthew.NauJava.domain.password.dto.PasswordEntrySpecDto;
 import ru.matthew.NauJava.domain.password.dto.PasswordEntryResponseDto;
 import ru.matthew.NauJava.domain.password.exception.PasswordEntryNotFoundException;
 
@@ -56,7 +57,7 @@ public interface PasswordEntryService {
     /**
      * Обновляет логин в существующей записи пароля.
      *
-     * @param id уникальный идентификатор обновляемой записи
+     * @param id    уникальный идентификатор обновляемой записи
      * @param login новый логин (имя пользователя) для сервиса
      * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененного пользователя.
      * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
@@ -66,7 +67,7 @@ public interface PasswordEntryService {
     /**
      * Обновляет название сервиса в существующей записи пароля.
      *
-     * @param id уникальный идентификатор обновляемой записи
+     * @param id          уникальный идентификатор обновляемой записи
      * @param serviceName новое название сервиса
      * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененного пользователя.
      * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
@@ -76,7 +77,7 @@ public interface PasswordEntryService {
     /**
      * Обновляет текстовое описание (заметку) в существующей записи пароля.
      *
-     * @param id уникальный идентификатор обновляемой записи
+     * @param id          уникальный идентификатор обновляемой записи
      * @param description новое описание или заметка
      * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененного пользователя.
      * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
@@ -86,19 +87,20 @@ public interface PasswordEntryService {
     /**
      * Обновляет сам пароль в существующей записи.
      *
-     * @param id уникальный идентификатор обновляемой записи
-     * @param password новый пароль в виде массива символов (char[]) в целях безопасности
+     * @param id  уникальный идентификатор обновляемой записи
+     * @param dto данные для обновления пароля
      * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененного пользователя.
      * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
      */
-    PasswordEntryResponseDto updatePassword(Long id, char[] password);
+    PasswordEntryResponseDto updatePassword(Long id, PasswordEntrySpecDto dto);
 
     /**
      * Удаляет запись пароля по названию сервиса.
      *
+     * @param id
      * @param serviceName название сервиса, запись для которого необходимо удалить
      */
-    void deleteByServiceName(String serviceName);
+    void deleteByServiceName(Long id, String serviceName);
 
     /**
      * Удаляет запись пароля по её уникальному идентификатору.

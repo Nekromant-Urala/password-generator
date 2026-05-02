@@ -42,7 +42,7 @@ public class EncryptionServiceImpl implements EncryptionService {
             byte[] salt = randomGenerator.getRandomBytes(cipher.getSpec().getSaltLengthByte());
             byte[] iv = randomGenerator.getRandomBytes(cipher.getSpec().getIvLengthByte());
 
-            SecretKey key = secretKeyGenerator.generateSecretKey(cipherAlgorithm.getName(), masterPassword, salt, iterations);
+            SecretKey key = secretKeyGenerator.generateSecretKey(cipher.getSpec(), masterPassword, salt, iterations);
 
             byte[] encryptedData = cipher.encrypt(data, key, iv);
             byte[] encryptedDataWithMeta = ByteBuffer.allocate(iv.length + salt.length + encryptedData.length)
@@ -74,7 +74,7 @@ public class EncryptionServiceImpl implements EncryptionService {
             byte[] encryptedDataWithoutMeta = new byte[buffer.remaining()];
             buffer.get(encryptedDataWithoutMeta);
 
-            SecretKey secretKey = secretKeyGenerator.generateSecretKey(cipher.getSpec().getName(), masterPassword, salt, iterations);
+            SecretKey secretKey = secretKeyGenerator.generateSecretKey(cipher.getSpec(), masterPassword, salt, iterations);
 
             return cipher.decrypt(encryptedDataWithoutMeta, secretKey, iv);
 

@@ -3,12 +3,17 @@ package ru.matthew.NauJava.domain.password;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.matthew.NauJava.domain.crypto.encrypt.EncryptionService;
 import ru.matthew.NauJava.domain.password.dto.PasswordEntryCreateDto;
+import ru.matthew.NauJava.domain.password.dto.PasswordEntrySpecDto;
 import ru.matthew.NauJava.domain.password.dto.PasswordEntryResponseDto;
 import ru.matthew.NauJava.domain.password.exception.PasswordEntryNotFoundException;
 import ru.matthew.NauJava.domain.password.mapper.PasswordEntryMapper;
 
+import java.util.Arrays;
 import java.util.List;
+
+import static ru.matthew.NauJava.common.utils.ConverterUtils.charsToBytes;
 
 @Service
 @Transactional
@@ -16,18 +21,28 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
 
     private final PasswordEntryMapper passwordEntryMapper;
     private final PasswordEntryRepository passwordEntryRepository;
+    private final EncryptionService encryptionService;
 
     @Autowired
-    public PasswordEntryServiceImpl(PasswordEntryMapper passwordEntryMapper, PasswordEntryRepository passwordEntryRepository) {
+    public PasswordEntryServiceImpl(PasswordEntryMapper passwordEntryMapper, PasswordEntryRepository passwordEntryRepository, EncryptionService encryptionService) {
         this.passwordEntryMapper = passwordEntryMapper;
         this.passwordEntryRepository = passwordEntryRepository;
+        this.encryptionService = encryptionService;
     }
 
     @Override
     public PasswordEntryResponseDto createPasswordEntry(PasswordEntryCreateDto dto) {
         var entry = passwordEntryMapper.toPasswordEntry(dto);
-        //TODO добавить шифрования пароля
-        entry.setPassword(String.valueOf(dto.password()));
+
+        entry.setPassword(Arrays.toString(
+                encryptionService.encrypt(
+                        charsToBytes(dto.password()),
+                        dto.password(),
+                        dto.cipherSpec(),
+                        dto.kdfSpec(),
+                        dto.iterations())
+        ));
+
         passwordEntryRepository.save(entry);
         return passwordEntryMapper.toPasswordEntryResponseDto(entry);
     }
@@ -95,18 +110,24 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     }
 
     @Override
-    public PasswordEntryResponseDto updatePassword(Long id, char[] password) {
+    public PasswordEntryResponseDto updatePassword(Long id, PasswordEntrySpecDto dto) {
         var entry = passwordEntryRepository.findById(id).orElseThrow(
                 () -> new PasswordEntryNotFoundException("Запись с таким id: '%d' не была найдена.".formatted(id))
         );
-        //TODO добавление шифрования пароля
-        entry.setPassword(String.valueOf(password));
+        entry.setPassword(Arrays.toString(
+                encryptionService.encrypt(
+                        charsToBytes(dto.password()),
+                        dto.password(),
+                        dto.cipherSpec(),
+                        dto.kdfSpec(),
+                        dto.iterations())
+        ));
         passwordEntryRepository.save(entry);
         return passwordEntryMapper.toPasswordEntryResponseDto(entry);
     }
 
     @Override
-    public void deleteByServiceName(String serviceName) {
+    public void deleteByServiceName(Long id, String serviceName) {
         passwordEntryRepository.deleteByServiceName(serviceName);
     }
 
