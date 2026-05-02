@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.domain.user;
+package ru.matthew.NauJava.domain.user.dto;
 
 public record UserCreateDto(
         String username,

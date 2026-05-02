@@ -1,107 +1,111 @@
 package ru.matthew.NauJava.domain.password;
 
-import ru.matthew.NauJava.domain.user.User;
+import ru.matthew.NauJava.domain.password.dto.PasswordEntryCreateDto;
+import ru.matthew.NauJava.domain.password.dto.PasswordEntrySpecDto;
+import ru.matthew.NauJava.domain.password.dto.PasswordEntryResponseDto;
+import ru.matthew.NauJava.domain.password.exception.PasswordEntryNotFoundException;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
+/**
+ * Интерфейс сервиса для управления записями паролей.
+ */
 public interface PasswordEntryService {
 
     /**
-     * Создает новую запись пароля в хранилище
+     * Создает новую запись пароля на основе переданных данных.
      *
-     * @param login       логин пользователя для сервиса
-     * @param password    пароль для доступа к сервису
-     * @param description дополнительное описание записи
-     * @param serviceName наименование сервиса
-     * @param user        Объект типа {@link User} содержащий информацию о пользователе
+     * @param dto объект передачи данных (DTO), содержащий информацию для создания записи
+     * @return Возвращает объект {@link PasswordEntryCreateDto} с данными созданного пользователя.
      */
-    void createPasswordEntry(String login, String password, String description, String serviceName, User user);
+    PasswordEntryResponseDto createPasswordEntry(PasswordEntryCreateDto dto);
 
     /**
-     * Выполняет поиск записей паролей, которые были сгенерированы за определенный промежуток времени
+     * Выполняет поиск записи пароля по её уникальному идентификатору.
      *
-     * @param startDate начальная дата временного промежутка для поиска
-     * @param endDate   конечная дата временного промежутка для поиска
-     * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
+     * @param id уникальный идентификатор записи пароля
+     * @return Возвращает объект {@link PasswordEntryResponseDto} с данными найденного пользователя.
+     * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
      */
-    List<PasswordEntry> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+    PasswordEntryResponseDto findById(Long id);
 
     /**
-     * Находит запись пароля по её уникальному идентификатору
+     * Выполняет поиск записи пароля по точному названию сервиса.
      *
-     * @param id уникальный идентификатор записи
-     * @return найденная запись
+     * @param serviceName название сервиса (например, "Google", "GitHub")
+     * @return Возвращает список объектов {@link PasswordEntryResponseDto} с данными найденного пользователя.
+     * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
      */
-    Optional<PasswordEntry> findById(Long id);
+    List<PasswordEntryResponseDto> findByServiceName(String serviceName);
 
     /**
-     * Находит все записи паролей для указанного сервиса
+     * Выполняет поиск записи пароля, связанной с конкретным пользователем.
      *
-     * @param serviceName название сервиса или приложения
-     * @return список записей паролей для указанного сервиса
+     * @param userId DTO с данными пользователя, для которого выполняется поиск
+     * @return Возвращает список объектов {@link PasswordEntryResponseDto} с данными найденного пользователя.
+     * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
      */
-    List<PasswordEntry> findByServiceName(String serviceName);
+    List<PasswordEntryResponseDto> findByUserId(Long userId);
 
     /**
-     * Выполняет поиск всех записей для конкретного пользователя
+     * Возвращает список всех существующих записей паролей.
      *
-     * @param username имя пользователь чьи записи нужно найти
-     * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
+     * @return Список всех пользователей объектов {@link PasswordEntryResponseDto}
      */
-    List<PasswordEntry> findByUsername(String username);
+    List<PasswordEntryResponseDto> findAll();
 
     /**
-     * Возвращает список всех записей паролей в хранилище.
+     * Обновляет логин в существующей записи пароля.
      *
-     * @return список всех записей-паролей
+     * @param id    уникальный идентификатор обновляемой записи
+     * @param login новый логин (имя пользователя) для сервиса
+     * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененного пользователя.
+     * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
      */
-    List<PasswordEntry> findAll();
+    PasswordEntryResponseDto updateLogin(Long id, String login);
 
     /**
-     * Удаляет запись пароля по её уникальному идентификатору
+     * Обновляет название сервиса в существующей записи пароля.
      *
-     * @param id уникальный идентификатор записи
+     * @param id          уникальный идентификатор обновляемой записи
+     * @param serviceName новое название сервиса
+     * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененного пользователя.
+     * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
+     */
+    PasswordEntryResponseDto updateServiceName(Long id, String serviceName);
+
+    /**
+     * Обновляет текстовое описание (заметку) в существующей записи пароля.
+     *
+     * @param id          уникальный идентификатор обновляемой записи
+     * @param description новое описание или заметка
+     * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененного пользователя.
+     * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
+     */
+    PasswordEntryResponseDto updateDescription(Long id, String description);
+
+    /**
+     * Обновляет сам пароль в существующей записи.
+     *
+     * @param id  уникальный идентификатор обновляемой записи
+     * @param dto данные для обновления пароля
+     * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененного пользователя.
+     * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
+     */
+    PasswordEntryResponseDto updatePassword(Long id, PasswordEntrySpecDto dto);
+
+    /**
+     * Удаляет запись пароля по названию сервиса.
+     *
+     * @param id
+     * @param serviceName название сервиса, запись для которого необходимо удалить
+     */
+    void deleteByServiceName(Long id, String serviceName);
+
+    /**
+     * Удаляет запись пароля по её уникальному идентификатору.
+     *
+     * @param id уникальный идентификатор записи, которую необходимо удалить
      */
     void deleteById(Long id);
-
-    /**
-     * Удаляет все записи паролей для указанного сервиса
-     *
-     * @param serviceName название сервиса или приложения
-     */
-    void deleteByServiceName(String serviceName);
-
-    /**
-     * Обновляет пароль для существующей записи
-     *
-     * @param id          уникальный идентификатор записи
-     * @param newPassword новый пароль
-     */
-    void updatePassword(Long id, String newPassword);
-
-    /**
-     * Обновляет логин для существующей записи
-     *
-     * @param id       уникальный идентификатор записи
-     * @param newLogin новый логин
-     */
-    void updateLogin(Long id, String newLogin);
-
-    /**
-     * Обновляет название сервиса для существующей записи
-     *
-     * @param id             уникальный идентификатор записи
-     * @param newServiceName новое название сервиса или приложения
-     */
-    void updateServiceName(Long id, String newServiceName);
-
-    /**
-     * Обновляет описание для существующей записи
-     *
-     * @param id             уникальный идентификатор записи
-     * @param newDescription новое описание
-     */
-    void updateDescription(Long id, String newDescription);
 }

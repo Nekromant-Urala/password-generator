@@ -1,8 +1,8 @@
 package ru.matthew.NauJava.domain.profile;
 
 import jakarta.persistence.*;
-import ru.matthew.NauJava.domain.crypto.algoritm.cipher.CipherAlgorithm;
-import ru.matthew.NauJava.domain.crypto.algoritm.kdf.KdfAlgorithm;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithm;
+import ru.matthew.NauJava.domain.crypto.algorithm.kdf.KdfAlgorithm;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;

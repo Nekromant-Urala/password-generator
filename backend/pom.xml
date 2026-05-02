@@ -60,6 +60,12 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.84</version>
+        </dependency>
+
         <!--        SPRING DATA        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

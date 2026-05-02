@@ -7,6 +7,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
+import ru.matthew.NauJava.domain.user.mapper.UserMapper;
+import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
@@ -35,7 +38,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserResponseDto createUser(UserCreateDto userDto) {
         var user = userMapper.toUser(userDto);
-        if (userRepository.findById(user.getId()).isPresent()) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException("Пользователь уже существует");
         }
 
@@ -48,48 +51,58 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserResponseDto> findById(Long id) {
-        return userRepository.findById(id).map(userMapper::toResponseDto);
+    public UserResponseDto findById(Long id) {
+        return userRepository.findById(id).map(userMapper::toResponseDto).orElseThrow(
+                () -> new UserNotFoundException("Пользователь по заданному id: '%d' не был найден.".formatted(id))
+        );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserResponseDto> findByUsername(String username) {
-        return userRepository.findByUsername(username).map(userMapper::toResponseDto);
+    public UserResponseDto findByUsername(String username) {
+        return userRepository.findByUsername(username).map(userMapper::toResponseDto).orElseThrow(
+                () -> new UserNotFoundException("Пользователь по заданному username: '%s' не был найден.".formatted(username))
+        );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserResponseDto> findByEmail(String email) {
-        return userRepository.findByEmail(email).map(userMapper::toResponseDto);
+    public UserResponseDto findByEmail(String email) {
+        return userRepository.findByEmail(email).map(userMapper::toResponseDto).orElseThrow(
+                () -> new UserNotFoundException("Пользователь по заданному email: '%s' не был найден.".formatted(email))
+        );
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserResponseDto> findAll() {
-        return userRepository.findAll().stream().map(userMapper::toResponseDto).toList();
+        return userRepository.findAll().stream()
+                .map(userMapper::toResponseDto)
+                .toList();
     }
 
     @Override
-    public void updateEmail(Long id, String email) {
+    public UserResponseDto updateEmail(Long id, String email) {
         var user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении email".formatted(id))
         );
         user.setEmail(email);
         userRepository.save(user);
+        return userMapper.toResponseDto(user);
     }
 
     @Override
-    public void updateUsername(Long id, String username) {
+    public UserResponseDto updateUsername(Long id, String username) {
         var user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении username".formatted(id))
         );
         user.setUsername(username);
         userRepository.save(user);
+        return userMapper.toResponseDto(user);
     }
 
     @Override
-    public void updatePassword(Long id, char[] password) {
+    public UserResponseDto updatePassword(Long id, char[] password) {
         var user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении password".formatted(id))
         );
@@ -99,6 +112,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } finally {
             Arrays.fill(password, '\0');
         }
+        return userMapper.toResponseDto(user);
     }
 
     @Override

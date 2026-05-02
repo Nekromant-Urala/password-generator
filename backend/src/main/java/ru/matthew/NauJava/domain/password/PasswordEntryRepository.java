@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import ru.matthew.NauJava.domain.password.dto.PasswordEntryResponseDto;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -15,37 +16,22 @@ import java.util.List;
 public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Long> {
 
     /**
-     * Выполняет поиск записей паролей, которые были сгенерированы за определенный промежуток времени
      *
-     * @param startDate начальная дата временного промежутка для поиска
-     * @param endDate   конечная дата временного промежутка для поиска
-     * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
+     * @param serviceName
+     * @return
      */
-    List<PasswordEntry> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+    List<PasswordEntry> findByServiceName(String serviceName);
 
     /**
-     * Выполняет поиск всех записей для конкретного пользователя
      *
-     * @param user пользователь чьи записи нужно найти
-     * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
+     * @param userId
+     * @return
      */
-    List<PasswordEntry> findByUser(User user);
+    List<PasswordEntry> findByUserId(Long userId);
 
     /**
-     * Удаление записей паролей по определенному названия сервиса
      *
-     * @param serviceName наименование сервиса
+     * @param serviceName
      */
-    @Modifying
-    @Query("DELETE FROM PasswordEntry e WHERE e.serviceName = :serviceName")
     void deleteByServiceName(String serviceName);
-
-    /**
-     * Выполняет поиск записей паролей, которые были созданы для какого-то конкретного сервиса
-     *
-     * @param serviceName наименование сервиса
-     * @return Возвращает список записей паролей в виде {@code List<PasswordEntry>}
-     */
-    @Query("SELECT e FROM PasswordEntry e WHERE e.serviceName = :serviceName")
-    List<PasswordEntry> findByServiceName(@Param("serviceName") String serviceName);
 }

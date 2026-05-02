@@ -30,7 +30,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginProcessingUrl("api/auth/login")
+                        .loginProcessingUrl("/api/auth/login")
                         .successHandler((req, res, auth) -> res.setStatus(200))
                         .failureHandler((req, res, authEx) -> res.setStatus(401))
                 );
