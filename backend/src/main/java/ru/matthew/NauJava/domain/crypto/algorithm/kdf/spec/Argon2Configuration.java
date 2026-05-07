@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.domain.crypto.algorithm.kdf;
+package ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec;
 
 /**
  * Интерфейс для получения конфигурации алгоритма Argon2

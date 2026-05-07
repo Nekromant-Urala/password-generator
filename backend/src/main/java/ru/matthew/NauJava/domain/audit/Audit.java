@@ -1,13 +1,14 @@
 package ru.matthew.NauJava.domain.audit;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "audit_log")
-public class AuditLog {
+public class Audit {
 
     @Id
     @Column(name = "id")
@@ -19,21 +20,18 @@ public class AuditLog {
     private EventType eventType;
 
     @Column(name = "event_description")
-    private String eventDescription;
+    private String description;
 
     @Column(name = "user_agent")
     private String userAgent;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @ManyToOne()
     @JoinColumn(name = "user_id")
     private User user;
-
-    public AuditLog() {
-        createdAt = LocalDateTime.now();
-    }
 
     public Long getId() {
         return id;
@@ -51,12 +49,12 @@ public class AuditLog {
         this.eventType = eventType;
     }
 
-    public String getEventDescription() {
-        return eventDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setEventDescription(String eventDescription) {
-        this.eventDescription = eventDescription;
+    public void setDescription(String eventDescription) {
+        this.description = eventDescription;
     }
 
     public String getUserAgent() {

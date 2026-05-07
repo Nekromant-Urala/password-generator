@@ -1,8 +1,9 @@
 package ru.matthew.NauJava.domain.profile;
 
 import jakarta.persistence.*;
-import ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithm;
-import ru.matthew.NauJava.domain.crypto.algorithm.kdf.KdfAlgorithm;
+import org.hibernate.annotations.CreationTimestamp;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpec;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -43,24 +44,21 @@ public class GeneratorProfile {
     @Column(name = "custom_chars")
     private String customChars;
 
+    @CreationTimestamp
     @Column(name = "create_at")
     private LocalDateTime createAt;
+
+    @Column(name = "kdf_algorithm")
+    @Enumerated(value = EnumType.STRING)
+    private KdfAlgorithmSpec kdfAlgorithm;
+
+    @Column(name = "algorithm_id")
+    @Enumerated(value = EnumType.STRING)
+    private CipherAlgorithmSpec cipher;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "kdf_algorithm_id")
-    private KdfAlgorithm kdfAlgorithm;
-
-    @ManyToOne
-    @JoinColumn(name = "algorithm_id")
-    private CipherAlgorithm cipher;
-
-    public GeneratorProfile() {
-        createAt = LocalDateTime.now();
-    }
 
     public Long getId() {
         return id;
@@ -146,8 +144,8 @@ public class GeneratorProfile {
         return createAt;
     }
 
-    public void setCreateAt(LocalDateTime create_at) {
-        this.createAt = create_at;
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
     }
 
     public User getUser() {
@@ -158,20 +156,19 @@ public class GeneratorProfile {
         this.user = user;
     }
 
-    public KdfAlgorithm getKdfAlgorithm() {
+    public KdfAlgorithmSpec getKdfAlgorithm() {
         return kdfAlgorithm;
     }
 
-    public void setKdfAlgorithm(KdfAlgorithm kdfAlgorithm) {
+    public void setKdfAlgorithm(KdfAlgorithmSpec kdfAlgorithm) {
         this.kdfAlgorithm = kdfAlgorithm;
     }
 
-    public CipherAlgorithm getCipher() {
+    public CipherAlgorithmSpec getCipher() {
         return cipher;
     }
 
-    public void setCipher(CipherAlgorithm cipher) {
+    public void setCipher(CipherAlgorithmSpec cipher) {
         this.cipher = cipher;
     }
-
 }

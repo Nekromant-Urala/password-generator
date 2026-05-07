@@ -1,6 +1,9 @@
 package ru.matthew.NauJava.domain.report;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reports")
@@ -14,6 +17,10 @@ public class Report {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private ReportStatus status;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
@@ -40,5 +47,13 @@ public class Report {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

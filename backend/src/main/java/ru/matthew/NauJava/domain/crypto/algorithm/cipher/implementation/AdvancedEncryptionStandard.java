@@ -1,7 +1,7 @@
 package ru.matthew.NauJava.domain.crypto.algorithm.cipher.implementation;
 
 import org.springframework.stereotype.Component;
-import ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.algorithm.cipher.SymmetricCipher;
 import ru.matthew.NauJava.domain.crypto.exception.EncryptionException;
 
@@ -9,7 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
-import static ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithmSpec.AES;
+import static ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec.AES;
 
 @Component
 public class AdvancedEncryptionStandard implements SymmetricCipher {

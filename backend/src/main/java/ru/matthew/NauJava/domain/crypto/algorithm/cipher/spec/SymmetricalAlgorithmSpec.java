@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.domain.crypto.algorithm.cipher;
+package ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec;
 
 /**
  * Интерфейс для получения конфигураций симметричных алгоритмов шифрования.

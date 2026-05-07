@@ -1,9 +1,13 @@
 package ru.matthew.NauJava.domain.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
+import ru.matthew.NauJava.domain.user.dto.UserUpdateEmailDto;
+import ru.matthew.NauJava.domain.user.dto.UserUpdatePasswordDto;
+import ru.matthew.NauJava.domain.user.dto.UserUpdateUsernameDto;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,49 +29,49 @@ public class UserRestController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/{email}")
-    public ResponseEntity<UserResponseDto> getUserByEmail(@PathVariable String email) {
+    @GetMapping("/search/email")
+    public ResponseEntity<UserResponseDto> getUserByEmail(@RequestParam String email) {
         var user = userService.findByEmail(email);
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/name/{username}")
-    public ResponseEntity<UserResponseDto> getUserByUsername(@PathVariable String username) {
+    @GetMapping("/search/username")
+    public ResponseEntity<UserResponseDto> getUserByUsername(@RequestParam String username) {
         var user = userService.findByUsername(username);
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<UserResponseDto>> getAllUser() {
         var users = userService.findAll();
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping("/update/username/{id}")
-    public ResponseEntity<UserResponseDto> updateUsername(@PathVariable Long id, @RequestBody String username) {
-        var dto = userService.updateUsername(id, username);
+    @PutMapping("/{id}/username")
+    public ResponseEntity<UserResponseDto> updateUsername(@PathVariable Long id, @RequestBody UserUpdateUsernameDto req) {
+        var dto = userService.updateUsername(id, req.username());
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping("/update/email/{id}")
-    public ResponseEntity<UserResponseDto> updateEmail(@PathVariable Long id, @RequestBody String email) {
-        var dto = userService.updateEmail(id, email);
+    @PutMapping("/{id}/email")
+    public ResponseEntity<UserResponseDto> updateEmail(@PathVariable Long id, @RequestBody UserUpdateEmailDto req) {
+        var dto = userService.updateEmail(id, req.email());
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping("/update/password/{id}")
-    public ResponseEntity<UserResponseDto> updatePassword(@PathVariable Long id, @RequestBody char[] password) {
+    @PutMapping("/{id}/password")
+    public ResponseEntity<UserResponseDto> updatePassword(@PathVariable Long id, @RequestBody UserUpdatePasswordDto req) {
         try {
-            var dto = userService.updatePassword(id, password);
+            var dto = userService.updatePassword(id, req.password());
             return ResponseEntity.ok(dto);
         } finally {
-            Arrays.fill(password, '\0');
+            Arrays.fill(req.password(), '\0');
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
-        return ResponseEntity.ok("Пользователь с id: '%d'был удален".formatted(id));
+        return ResponseEntity.noContent().build();
     }
 }

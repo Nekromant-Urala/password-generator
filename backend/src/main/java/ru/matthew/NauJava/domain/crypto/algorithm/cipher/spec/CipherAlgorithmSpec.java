@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.domain.crypto.algorithm.cipher;
+package ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec;
 
 public enum CipherAlgorithmSpec implements SymmetricalAlgorithmSpec {
     AES(

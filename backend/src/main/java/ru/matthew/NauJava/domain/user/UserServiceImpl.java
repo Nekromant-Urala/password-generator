@@ -16,7 +16,6 @@ import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static ru.matthew.NauJava.domain.user.Role.USER;
 
@@ -53,7 +52,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional(readOnly = true)
     public UserResponseDto findById(Long id) {
         return userRepository.findById(id).map(userMapper::toResponseDto).orElseThrow(
-                () -> new UserNotFoundException("Пользователь по заданному id: '%d' не был найден.".formatted(id))
+                () -> new UserNotFoundException(id)
         );
     }
 

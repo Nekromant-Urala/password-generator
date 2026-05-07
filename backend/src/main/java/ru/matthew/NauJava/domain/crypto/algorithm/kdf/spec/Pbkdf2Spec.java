@@ -1,4 +1,4 @@
-package ru.matthew.NauJava.domain.crypto.algorithm.kdf;
+package ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec;
 
 public enum Pbkdf2Spec implements Pbkdf2Configuration {
     PBKDF_2(

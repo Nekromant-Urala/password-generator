@@ -17,7 +17,7 @@ public class PasswordEntry {
     @Column(name = "login")
     private String login;
 
-    @Column(name = "encrypt_password")
+    @Column(name = "encrypt_password", columnDefinition = "TEXT")
     private String password;
 
     @Column(name = "created_at")
@@ -29,7 +29,7 @@ public class PasswordEntry {
     @Column(name = "service_name")
     private String serviceName;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne

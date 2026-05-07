@@ -1,5 +1,6 @@
 package ru.matthew.NauJava.domain.crypto.algorithm.cipher;
 
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.exception.EncryptionException;
 
 import javax.crypto.SecretKey;

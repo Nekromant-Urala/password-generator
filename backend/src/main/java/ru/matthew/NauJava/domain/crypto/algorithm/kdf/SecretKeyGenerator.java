@@ -1,6 +1,7 @@
 package ru.matthew.NauJava.domain.crypto.algorithm.kdf;
 
-import ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpec;
 
 import javax.crypto.SecretKey;
 

@@ -6,10 +6,9 @@ import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Сервис для управления пользователями.
+ * Интерфейс сервиса для управления пользователями.
  * Обрабатывает бизнес-логику создания, обновления и поиска пользователей.
  */
 public interface UserService {

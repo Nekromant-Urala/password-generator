@@ -1,8 +1,8 @@
 package ru.matthew.NauJava.domain.crypto.algorithm.kdf.implementation;
 
 import org.springframework.stereotype.Component;
-import ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithmSpec;
-import ru.matthew.NauJava.domain.crypto.algorithm.kdf.KdfAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.SecretKeyGenerator;
 import ru.matthew.NauJava.domain.crypto.exception.EncryptionException;
 
@@ -13,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import java.security.spec.KeySpec;
 
-import static ru.matthew.NauJava.domain.crypto.algorithm.kdf.Pbkdf2Spec.PBKDF_2;
+import static ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.Pbkdf2Spec.PBKDF_2;
 
 @Component
 public class Pbkdf2 implements SecretKeyGenerator {

@@ -3,14 +3,14 @@ package ru.matthew.NauJava.domain.crypto.algorithm.kdf.implementation;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.springframework.stereotype.Component;
-import ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithmSpec;
-import ru.matthew.NauJava.domain.crypto.algorithm.kdf.KdfAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.SecretKeyGenerator;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import static ru.matthew.NauJava.domain.crypto.algorithm.kdf.Argon2Spec.ARGON_2;
+import static ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.Argon2Spec.ARGON_2;
 
 @Component
 public class Argon2 implements SecretKeyGenerator {

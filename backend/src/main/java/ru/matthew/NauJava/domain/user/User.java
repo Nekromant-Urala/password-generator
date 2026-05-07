@@ -1,6 +1,7 @@
 package ru.matthew.NauJava.domain.user;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.matthew.NauJava.domain.password.PasswordEntry;
 import ru.matthew.NauJava.domain.profile.GeneratorProfile;
 
@@ -26,9 +27,10 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "password_hash")
+    @Column(name = "password_hash", columnDefinition = "TEXT")
     private String password;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -42,9 +44,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GeneratorProfile> profiles = new ArrayList<>();
 
-    public User() {
-        createdAt = LocalDateTime.now();
-    }
 
     public void addPasswordEntries(PasswordEntry passwordEntry) {
         passwordEntries.add(passwordEntry);
@@ -110,7 +109,7 @@ public class User {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime created_at) {
-        this.createdAt = created_at;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
