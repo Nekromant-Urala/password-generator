@@ -1,6 +1,6 @@
 package ru.matthew.NauJava.domain.user;
 
-import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
+import ru.matthew.NauJava.domain.user.dto.UserSingUpRequestDto;
 import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
@@ -21,7 +21,7 @@ public interface UserService {
      * @return Возвращает объект {@link UserResponseDto} с данными созданного пользователя.
      * @throws {@link UserAlreadyExistsException} если такой пользователь уже существует.
      */
-    UserResponseDto createUser(UserCreateDto userDto);
+    UserResponseDto createUser(UserSingUpRequestDto userDto);
 
     /**
      * Нахождение пользователя по уникальному идентификатору.

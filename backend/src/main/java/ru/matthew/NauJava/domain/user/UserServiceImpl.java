@@ -1,27 +1,23 @@
 package ru.matthew.NauJava.domain.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
+import ru.matthew.NauJava.domain.user.dto.UserSingUpRequestDto;
 import ru.matthew.NauJava.domain.user.mapper.UserMapper;
 import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import static ru.matthew.NauJava.domain.user.Role.USER;
+import static ru.matthew.NauJava.domain.user.Role.ROLE_USER;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
@@ -35,13 +31,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserResponseDto createUser(UserCreateDto userDto) {
+    public UserResponseDto createUser(UserSingUpRequestDto userDto) {
         var user = userMapper.toUser(userDto);
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException("Пользователь уже существует");
         }
 
-        user.setRole(USER);
+        user.setRole(ROLE_USER);
         user.setPassword(passwordEncoder.encode(String.valueOf(userDto.password())));
         userRepository.save(user);
 
@@ -112,17 +108,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             Arrays.fill(password, '\0');
         }
         return userMapper.toResponseDto(user);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .map(user -> new org.springframework.security.core.userdetails.User(
-                        user.getUsername(),
-                        user.getPassword(),
-                        Collections.singleton(user.getRole())
-                ))
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с username: '%s' не был найден".formatted(username)));
     }
 
     @Override

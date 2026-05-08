@@ -2,14 +2,14 @@ package ru.matthew.NauJava.domain.user.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.matthew.NauJava.domain.user.User;
-import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
+import ru.matthew.NauJava.domain.user.dto.UserSingUpRequestDto;
 import ru.matthew.NauJava.domain.user.dto.UserForPasswordEntryDto;
 import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 
 @Component
 public class UserMapper {
 
-    public User toUser(UserCreateDto dto) {
+    public User toUser(UserSingUpRequestDto dto) {
         if (dto == null) {
             return null;
         }

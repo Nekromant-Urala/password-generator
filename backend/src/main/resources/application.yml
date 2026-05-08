@@ -23,9 +23,22 @@ spring:
         highlight_sql: true
         hbm2ddl:
           auto: update
-  data:
-    rest:
-      base-path: /api
+
+jwt:
+  cookie-token-key: '{"kty":"oct","k":"956PBFst1FguLr5irJD-aQ"}'
+
+server:
+  http2:
+    enabled: true
+  ssl:
+    key-store: 'путь'
+    key-store-password: 'пароль'
+    key-alias: localhost
+  port: 8443
+
+logging:
+  level:
+    org.springframework.security: trace
 
 management:
   endpoints:
