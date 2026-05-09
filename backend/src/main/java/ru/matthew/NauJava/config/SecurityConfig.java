@@ -1,32 +1,60 @@
 package ru.matthew.NauJava.config;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.DirectDecrypter;
 import com.nimbusds.jose.crypto.DirectEncrypter;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.matthew.NauJava.domain.security.auth.jwt.TokenCookieAuthenticationConfigurer;
-import ru.matthew.NauJava.domain.security.auth.jwt.TokenCookieJweStringDeserializer;
-import ru.matthew.NauJava.domain.security.auth.jwt.TokenCookieJweStringSerializer;
+import ru.matthew.NauJava.domain.security.auth.jwt.JwtAuthenticationConfigurer;
+import ru.matthew.NauJava.domain.security.auth.jwt.access.AccessTokenJwsStringDeserializer;
+import ru.matthew.NauJava.domain.security.auth.jwt.access.AccessTokenJwsStringSerializer;
+import ru.matthew.NauJava.domain.security.auth.jwt.refresh.RefreshTokenJweStringDeserializer;
+import ru.matthew.NauJava.domain.security.auth.jwt.refresh.RefreshTokenJweStringSerializer;
+
+import java.text.ParseException;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public JwtAuthenticationConfigurer jwtAuthenticationConfigurer(
+            @Value("${jwt.access-token-key}") String accessTokenKey,
+            @Value("${jwt.refresh-token-key}") String refreshTokenKey,
+            JdbcTemplate jdbcTemplate
+    ) throws ParseException, JOSEException {
+        return new JwtAuthenticationConfigurer()
+                .accessTokenStringSerializer(new AccessTokenJwsStringSerializer(
+                        new MACSigner(OctetSequenceKey.parse(accessTokenKey))
+                ))
+                .refreshTokenStringSerializer(new RefreshTokenJweStringSerializer(
+                        new DirectEncrypter(OctetSequenceKey.parse(refreshTokenKey))
+                ))
+                .accessTokenStringDeserializer(new AccessTokenJwsStringDeserializer(
+                        new MACVerifier(OctetSequenceKey.parse(accessTokenKey))
+                ))
+                .refreshTokenStringDeserializer(new RefreshTokenJweStringDeserializer(
+                        new DirectDecrypter(OctetSequenceKey.parse(refreshTokenKey))
+                ))
+                .jdbcTemplate(jdbcTemplate);
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationConfigurer jwtAuthenticationConfigurer) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .with(jwtAuthenticationConfigurer, Customizer.withDefaults())
+                .csrf(Customizer.withDefaults())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
@@ -38,41 +66,6 @@ public class SecurityConfig {
                         .failureHandler((req, res, authEx) -> res.setStatus(401))
                 );
         return http.build();
-    }
-
-    @Bean
-    public TokenCookieJweStringSerializer tokenCookieJweStringSerializer(String cookieTokenKey) throws Exception {
-        return new TokenCookieJweStringSerializer(
-                new DirectEncrypter(OctetSequenceKey.parse(cookieTokenKey))
-        );
-    }
-
-    @Bean
-    public TokenCookieAuthenticationConfigurer tokenCookieAuthenticationConfigurer(String cookieTokenKey, JdbcTemplate jdbcTemplate) throws Exception {
-        return new TokenCookieAuthenticationConfigurer()
-                .tokenCookieStringDeserializer(
-                        new TokenCookieJweStringDeserializer(
-                                new DirectDecrypter(OctetSequenceKey.parse(cookieTokenKey))
-                        ))
-                .jdbcTemplate(jdbcTemplate);
-    }
-
-
-    @Bean
-    public UserDetailsService userDetailsService(JdbcTemplate jdbcTemplate) {
-        return username -> jdbcTemplate.query(
-                "select * from t_user where c_username = ?",
-                (rs, i) -> User.builder()
-                        .username(rs.getString("c_username"))
-                        .password(rs.getString("c_password"))
-                        .authorities(
-                                jdbcTemplate.query("select c_authority from t_user_authority where id_user = ?",
-                                        (rs1, i1) -> new SimpleGrantedAuthority(rs1.getString("c_authority")),
-                                        rs.getInt("id")
-                                )
-                        ).build(), username
-
-        ).stream().findFirst().orElse(null);
     }
 
     @Bean
