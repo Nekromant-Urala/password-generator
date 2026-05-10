@@ -22,10 +22,20 @@ spring:
         show_sql: true
         highlight_sql: true
         hbm2ddl:
-          auto: update
-  data:
-    rest:
-      base-path: /api
+          auto: create-drop
+
+#server:
+#  port: 8443  # Стандартный порт для HTTPS
+#  ssl:
+#    # Путь к файлу хранилища ключей. classpath: означает, что файл лежит в src/main/resources
+#    # keytool -genkeypair -alias tomcat -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650
+#    key-store: classpath:keystore.p12
+#    # Пароль от хранилища ключей
+#    key-store-password: your-keystore-password
+#    # Тип хранилища (PKCS12 или JKS)
+#    key-store-type: PKCS12
+#    # Алиас вашего ключа (опционально, если в хранилище только один ключ)
+#    key-alias: tomcat
 
 management:
   endpoints:

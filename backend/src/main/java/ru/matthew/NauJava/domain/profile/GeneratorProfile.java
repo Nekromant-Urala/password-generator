@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpecConverter;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -49,7 +50,7 @@ public class GeneratorProfile {
     private LocalDateTime createAt;
 
     @Column(name = "kdf_algorithm")
-    @Enumerated(value = EnumType.STRING)
+    @Convert(converter = KdfAlgorithmSpecConverter.class)
     private KdfAlgorithmSpec kdfAlgorithm;
 
     @Column(name = "algorithm_id")

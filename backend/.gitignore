@@ -38,4 +38,4 @@ mvnw.cmd
 
 ### Other Files & Dir ###
 .gitattributes
-src/main/resources/sql
+src/main/resources/BD_sql/
