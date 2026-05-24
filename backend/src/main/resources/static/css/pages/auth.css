@@ -1,0 +1,77 @@
+.auth-wrapper {
+    width: 400px;
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form h2 {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.password-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 25px 0 35px 0;
+    color: #fff;
+}
+
+.password-options label {
+    display: flex;
+    align-items: center;
+}
+
+#remember {
+    accent-color: #fff;
+}
+
+.password-options label p {
+    margin-left: 8px;
+}
+
+.auth-wrapper a {
+    color: #efefef;
+    text-decoration: none;
+}
+
+.auth-wrapper a:hover {
+    text-decoration: underline;
+}
+
+.account-options {
+    text-align: center;
+    margin-top: 30px;
+    color: #fff;
+}
+
+.auth-error {
+    color: #ffb4b4;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.auth-note {
+    color: #fff3bf;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.auth-success {
+    color: #b8f5c8;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    text-align: left;
+}
