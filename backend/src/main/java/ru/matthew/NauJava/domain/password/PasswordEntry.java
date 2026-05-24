@@ -4,7 +4,7 @@ package ru.matthew.NauJava.domain.password;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import ru.matthew.NauJava.domain.profile.GeneratorProfile;
+import ru.matthew.NauJava.domain.profile.Profile;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -43,7 +43,7 @@ public class PasswordEntry {
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
-    private GeneratorProfile profile;
+    private Profile profile;
 
     public Long getId() {
         return id;
@@ -109,11 +109,11 @@ public class PasswordEntry {
         this.user = user;
     }
 
-    public GeneratorProfile getProfile() {
+    public Profile getProfile() {
         return profile;
     }
 
-    public void setProfile(GeneratorProfile profile) {
+    public void setProfile(Profile profile) {
         this.profile = profile;
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
-import ru.matthew.NauJava.domain.profile.GeneratorProfileService;
+import ru.matthew.NauJava.domain.profile.ProfileService;
 import ru.matthew.NauJava.domain.user.dto.*;
 import ru.matthew.NauJava.domain.user.exception.UserPasswordMissMatchException;
 import ru.matthew.NauJava.domain.user.mapper.UserMapper;
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
-    private final GeneratorProfileService profileService;
+    private final ProfileService profileService;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             UserMapper userMapper,
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            GeneratorProfileService profileService,
+            ProfileService profileService,
             ApplicationEventPublisher eventPublisher
     ) {
         this.userMapper = userMapper;
@@ -114,17 +114,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserResponseDto updateFullUser(Long id, UserUpdateFullDto dto) {
-        var user = userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении всех данных".formatted(id))
-        );
-        userMapper.updateEntityFromUpdateFullDto(user, dto);
-
-        return userMapper.toResponseDto(user);
-    }
-
-
-    @Override
     public UserResponseDto updatePassword(Long id, UserUpdatePasswordDto dto) {
         var user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении password".formatted(id))
@@ -154,7 +143,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         var usernameOrEmail = username.trim();
         return userRepository.findByUsername(usernameOrEmail)
                 .or(() -> userRepository.findByEmail(usernameOrEmail))
-                .map(u -> new org.springframework.security.core.userdetails.User(
+                .map(u -> new CustomUserDetails(
+                        u.getId(),
                         u.getUsername(),
                         u.getPassword(),
                         Collections.singleton(u.getRole())

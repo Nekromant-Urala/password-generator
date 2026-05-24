@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
 import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.Pbkdf2Spec;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileRequestDto;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileResponseDto;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileUpdateDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileRequestDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileResponseDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
 import ru.matthew.NauJava.domain.profile.exception.ProfileNotFoundException;
-import ru.matthew.NauJava.domain.profile.mapper.GeneratorProfileMapper;
+import ru.matthew.NauJava.domain.profile.mapper.ProfileMapper;
 import ru.matthew.NauJava.domain.user.UserRepository;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
@@ -25,20 +25,20 @@ import static ru.matthew.NauJava.domain.audit.EventType.*;
 
 @Service
 @Transactional
-public class GeneratorProfileServiceImpl implements GeneratorProfileService {
+public class ProfileServiceImpl implements ProfileService {
 
     private final UserRepository userRepository;
 
-    private final GeneratorProfileMapper profileMapper;
-    private final GeneratorProfileRepository profileRepository;
+    private final ProfileMapper profileMapper;
+    private final ProfileRepository profileRepository;
 
     private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public GeneratorProfileServiceImpl(
+    public ProfileServiceImpl(
             UserRepository userRepository,
-            GeneratorProfileRepository profileRepository,
-            GeneratorProfileMapper profileMapper, ApplicationEventPublisher eventPublisher
+            ProfileRepository profileRepository,
+            ProfileMapper profileMapper, ApplicationEventPublisher eventPublisher
     ) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
@@ -48,7 +48,7 @@ public class GeneratorProfileServiceImpl implements GeneratorProfileService {
 
 
     @Override
-    public GeneratorProfileResponseDto createProfile(Long userId, GeneratorProfileRequestDto dto) {
+    public ProfileResponseDto createProfile(Long userId, ProfileRequestDto dto) {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(userId)
         );
@@ -64,11 +64,11 @@ public class GeneratorProfileServiceImpl implements GeneratorProfileService {
     }
 
     @Override
-    public GeneratorProfileResponseDto createDefaultProfile(Long userId) {
+    public ProfileResponseDto createDefaultProfile(Long userId) {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(userId)
         );
-        var defaultProfile = new GeneratorProfile.GeneratorProfileBuilder()
+        var defaultProfile = new Profile.GeneratorProfileBuilder()
                 .name("default")
                 .passwordLength(12)
                 .uppercase(true)
@@ -92,7 +92,7 @@ public class GeneratorProfileServiceImpl implements GeneratorProfileService {
 
     @Override
     @Transactional(readOnly = true)
-    public GeneratorProfileResponseDto findById(Long id) {
+    public ProfileResponseDto findById(Long id) {
         return profileRepository.findById(id)
                 .map(profileMapper::toGeneratorProfileResponseDto)
                 .orElseThrow(
@@ -102,7 +102,7 @@ public class GeneratorProfileServiceImpl implements GeneratorProfileService {
 
     @Override
     @Transactional(readOnly = true)
-    public GeneratorProfileResponseDto findByName(Long userId, String name) {
+    public ProfileResponseDto findByName(Long userId, String name) {
         return profileRepository.findByUserIdAndName(userId, name)
                 .map(profileMapper::toGeneratorProfileResponseDto)
                 .orElseThrow(
@@ -112,28 +112,28 @@ public class GeneratorProfileServiceImpl implements GeneratorProfileService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GeneratorProfileResponseDto> findAllByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+    public Page<ProfileResponseDto> findAllByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         return profileRepository.findAllByUserIdAndCreateAtBetween(userId, startDate, endDate, pageable)
                 .map(profileMapper::toGeneratorProfileResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GeneratorProfileResponseDto> findAllByCreateAt(Long userId, LocalDateTime createAt, Pageable pageable) {
+    public Page<ProfileResponseDto> findAllByCreateAt(Long userId, LocalDateTime createAt, Pageable pageable) {
         return profileRepository.findAllByUserIdAndCreateAt(userId, createAt, pageable)
                 .map(profileMapper::toGeneratorProfileResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<GeneratorProfileResponseDto> findAllByUserId(Long userId, Pageable pageable) {
+    public Page<ProfileResponseDto> findAllByUserId(Long userId, Pageable pageable) {
         return profileRepository.findAllByUserId(userId, pageable)
                 .map(profileMapper::toGeneratorProfileResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<GeneratorProfileResponseDto> findAll() {
+    public List<ProfileResponseDto> findAll() {
         return profileRepository.findAll().stream()
                 .map(profileMapper::toGeneratorProfileResponseDto)
                 .toList();
@@ -146,7 +146,7 @@ public class GeneratorProfileServiceImpl implements GeneratorProfileService {
 
     @Override
     //TODO добавить логику перешифрования данных, если изменились критичные параметры
-    public GeneratorProfileResponseDto updateSettings(Long id, GeneratorProfileUpdateDto dto) {
+    public ProfileResponseDto updateSettings(Long id, ProfileUpdateDto dto) {
         var profile = profileRepository.findById(id).orElseThrow(
                 () -> new ProfileNotFoundException(id)
         );

@@ -3,7 +3,7 @@ package ru.matthew.NauJava.domain.user;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import ru.matthew.NauJava.domain.password.PasswordEntry;
-import ru.matthew.NauJava.domain.profile.GeneratorProfile;
+import ru.matthew.NauJava.domain.profile.Profile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class User {
     private List<PasswordEntry> passwordEntries = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GeneratorProfile> profiles = new ArrayList<>();
+    private List<Profile> profiles = new ArrayList<>();
 
 
     public void addPasswordEntries(PasswordEntry passwordEntry) {
@@ -55,12 +55,12 @@ public class User {
         passwordEntry.setUser(null);
     }
 
-    public void addProfile(GeneratorProfile profile) {
+    public void addProfile(Profile profile) {
         profiles.add(profile);
         profile.setUser(this);
     }
 
-    public void removeProfile(GeneratorProfile profile) {
+    public void removeProfile(Profile profile) {
         profiles.remove(profile);
         profile.setUser(null);
     }

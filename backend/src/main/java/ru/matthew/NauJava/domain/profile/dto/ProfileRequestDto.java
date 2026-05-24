@@ -1,7 +1,7 @@
 package ru.matthew.NauJava.domain.profile.dto;
 
 
-public record GeneratorProfileUpdateDto(
+public record ProfileRequestDto(
         String name,
         int passwordLength,
         Boolean isUppercase,
@@ -15,7 +15,7 @@ public record GeneratorProfileUpdateDto(
         String cipher,
         int iterations
 ) {
-    public GeneratorProfileUpdateDto {
+    public ProfileRequestDto {
         if (isUppercase == null) {
             isUppercase = false;
         }

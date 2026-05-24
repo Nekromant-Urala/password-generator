@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 //TODO при удалении сущности, записи зашифрованные с помощью него будут не доступны (если изменяться параметры итерации или алгоритмов)
 @Entity
 @Table(name = "generator_profile")
-public class GeneratorProfile {
+public class Profile {
 
     @Id
     @Column(name = "id")
@@ -65,10 +65,10 @@ public class GeneratorProfile {
     @JoinColumn(name = "user_id")
     private User user;
 
-    protected GeneratorProfile() {
+    protected Profile() {
     }
 
-    public GeneratorProfile(GeneratorProfileBuilder builder) {
+    public Profile(GeneratorProfileBuilder builder) {
         this.name = builder.name;
         this.passwordLength = builder.passwordLength;
         this.isUppercase = builder.isUppercase;
@@ -157,8 +157,8 @@ public class GeneratorProfile {
             return this;
         }
 
-        public GeneratorProfile build() {
-            return new GeneratorProfile(this);
+        public Profile build() {
+            return new Profile(this);
         }
     }
 

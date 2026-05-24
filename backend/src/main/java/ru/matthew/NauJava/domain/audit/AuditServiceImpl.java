@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.matthew.NauJava.domain.audit.dto.AuditCreateDto;
 import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
 import ru.matthew.NauJava.domain.audit.dto.AuditResponseDto;
+import ru.matthew.NauJava.domain.audit.dto.AuditStatsResponseDto;
 import ru.matthew.NauJava.domain.audit.exception.NotFoundAuditEventException;
 import ru.matthew.NauJava.domain.audit.mapper.AuditMapper;
 import ru.matthew.NauJava.domain.password.PasswordEntryRepository;
@@ -88,7 +89,7 @@ public class AuditServiceImpl implements AuditService {
 
     @Override
     @Transactional(readOnly = true)
-    public long countAll() {
+    public long countAllEvent() {
         return auditRepository.count();
     }
 
@@ -101,13 +102,24 @@ public class AuditServiceImpl implements AuditService {
     @Override
     @Transactional(readOnly = true)
     public long countAllUserForLastDay() {
-        throw new UnsupportedOperationException("countAllUserForLastDay: UnsupportedOperationException");
+        //TODO исправить заглушку
+        return 0L;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public long countAllPasswordEntry() {
+    public long countAllPasswordEntries() {
         return passwordEntryRepository.count();
+    }
+
+    @Override
+    public AuditStatsResponseDto getAllStatsSystem() {
+        return auditMapper.toAuditStatsResponseDto(
+                countAllEvent(),
+                countAllUser(),
+                countAllPasswordEntries(),
+                countAllUserForLastDay()
+        );
     }
 
     @Override
@@ -130,8 +142,4 @@ public class AuditServiceImpl implements AuditService {
         auditRepository.deleteAllByCreatedAt(createdAt);
     }
 
-    @Override
-    public void deleteByUserAgent(String userAgent) {
-        throw new UnsupportedOperationException("deleteByUserAgent: UnsupportedOperationException");
-    }
 }

@@ -79,7 +79,7 @@ public class PasswordEntryController {
             RedirectAttributes redirectAttributes
     ) {
         var userDto = userService.findByUsername(userDetails.getUsername());
-        var entry = passwordEntryService.updateAllEntry(entryId, dto);
+        var entry = passwordEntryService.updatePatchEntry(entryId, dto);
         if (entry == null) {
             redirectAttributes.addFlashAttribute("vaultError", "Запись не найдена или недоступна.");
         } else {

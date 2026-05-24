@@ -29,13 +29,6 @@ public class UserMapper {
         }
     }
 
-    public void updateEntityFromUpdateFullDto(User user, UserUpdateFullDto dto) {
-        if (user == null || dto == null) {
-            return;
-        }
-        user.setUsername(dto.username());
-        user.setEmail(dto.email());
-    }
 
     public UserResponseDto toResponseDto(User user) {
         if (user == null) {

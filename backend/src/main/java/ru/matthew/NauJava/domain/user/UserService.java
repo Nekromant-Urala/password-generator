@@ -69,17 +69,6 @@ public interface UserService {
     UserResponseDto patchUser(Long id, UserPatchDto dto);
 
     /**
-     * Полное обновление данных пользователя.
-     * Обновление сразу электронной почты (email) и имени пользователя (username)
-     *
-     * @param id  уникальный идентификатор пользователя
-     * @param dto данные для обновления
-     * @return Возвращает объект {@link UserResponseDto} с данными измененного пользователя.
-     * @throws {@link UserNotFoundException} если пользователь с заданным id не существует.
-     */
-    UserResponseDto updateFullUser(Long id, UserUpdateFullDto dto);
-
-    /**
      * Устанавливает новый пароль для пользователя.
      *
      * @param id  уникальный идентификатор пользователя.
