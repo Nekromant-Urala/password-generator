@@ -1,9 +1,12 @@
 package ru.matthew.NauJava.domain.audit;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import ru.matthew.NauJava.domain.audit.dto.AuditCreateDto;
+import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
 import ru.matthew.NauJava.domain.audit.dto.AuditResponseDto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Интерфейс сервиса для управления записями аудита (логирования действий в системе).
@@ -13,9 +16,10 @@ public interface AuditService {
     /**
      * Создает новую пустую или базовую запись аудита.
      *
+     * @param dto информация о событии типа {@link AuditCreateDto}
      * @return DTO созданной записи аудита {@link AuditResponseDto}.
      */
-    AuditResponseDto createAudit();
+    AuditResponseDto createEvent(AuditCreateDto dto);
 
     /**
      * Поиск записи аудита по уникальному идентификатору.
@@ -28,10 +32,10 @@ public interface AuditService {
     /**
      * Поиск записей аудита по типу события.
      *
-     * @param type тип события аудита {@link EventType}.
+     * @param event тип события аудита {@link EventType}.
      * @return Список найденных записей {@link AuditResponseDto}.
      */
-    List<AuditResponseDto> findByEventType(EventType type);
+    Page<AuditResponseDto> findByEventType(EventType event, Pageable pageable);
 
     /**
      * Поиск записей аудита по User-Agent клиента.
@@ -39,7 +43,7 @@ public interface AuditService {
      * @param userAgent строка User-Agent из HTTP-запроса.
      * @return Список найденных записей {@link AuditResponseDto}.
      */
-    List<AuditResponseDto> findByUserAgent(String userAgent);
+    Page<AuditResponseDto> findByUserAgent(String userAgent, Pageable pageable);
 
     /**
      * Поиск записей аудита по дате их создания.
@@ -47,7 +51,7 @@ public interface AuditService {
      * @param createdAt дата и время создания записи.
      * @return Список найденных записей {@link AuditResponseDto}.
      */
-    List<AuditResponseDto> findByCreatedAt(LocalDateTime createdAt);
+    Page<AuditResponseDto> findByCreatedAt(LocalDateTime createdAt, Pageable pageable);
 
     /**
      * Поиск записей аудита, связанных с определенным пользователем.
@@ -55,7 +59,42 @@ public interface AuditService {
      * @param userId уникальный идентификатор пользователя.
      * @return Список найденных записей {@link AuditResponseDto}.
      */
-    List<AuditResponseDto> findByUserId(Long userId);
+    Page<AuditResponseDto> findByUserId(Long userId, Pageable pageable);
+
+    /**
+     * Возвращает все случившиеся события в системе
+     *
+     * @return Возвращает все случившиеся события в системе
+     */
+    Page<AuditResponseDto> findAll(Pageable pageable);
+
+    /**
+     * Подсчитывает количество всех событий в системе
+     *
+     * @return количество всех событий в системе
+     */
+    long countAll();
+
+    /**
+     * Подсчитывает количество всех пользователей в системе
+     *
+     * @return количество всех пользователей системы
+     */
+    long countAllUser();
+
+    /**
+     * Подсчитывает количество пользователей за последние 24 часа
+     *
+     * @return количество всех пользователей системы зарегистрированных за последние 24 часа
+     */
+    long countAllUserForLastDay();
+
+    /**
+     * Подсчитывает количество сгенерированных записей/паролей за всё время
+     *
+     * @return количество сгенерированных записей за все время
+     */
+    long countAllPasswordEntry();
 
     /**
      * Удаление записи аудита по её уникальному идентификатору.
@@ -74,9 +113,9 @@ public interface AuditService {
     /**
      * Удаление всех записей аудита указанного типа события.
      *
-     * @param type тип события {@link EventType}.
+     * @param event тип события {@link EventType}.
      */
-    void deleteByEventType(EventType type);
+    void deleteByEventType(EventType event);
 
     /**
      * Удаление записей аудита по дате их создания.
