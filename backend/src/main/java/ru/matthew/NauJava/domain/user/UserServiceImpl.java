@@ -1,12 +1,15 @@
 package ru.matthew.NauJava.domain.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
+import ru.matthew.NauJava.domain.profile.GeneratorProfileService;
 import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
 import ru.matthew.NauJava.domain.user.mapper.UserMapper;
 import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
@@ -17,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static ru.matthew.NauJava.domain.audit.EventType.*;
 import static ru.matthew.NauJava.domain.user.Role.USER;
 
 @Service
@@ -25,27 +29,45 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
+    private final GeneratorProfileService profileService;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public UserServiceImpl(UserMapper userMapper, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(
+            UserMapper userMapper,
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            GeneratorProfileService profileService,
+            ApplicationEventPublisher eventPublisher
+    ) {
         this.userMapper = userMapper;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.profileService = profileService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
     public UserResponseDto createUser(UserCreateDto userDto) {
         var user = userMapper.toUser(userDto);
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new UserAlreadyExistsException("Пользователь уже существует");
+            throw new UserAlreadyExistsException("Пользователь с таким именем уже существует");
+        }
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("Пользователь с такой почтой уже зарегистрирован");
         }
 
         user.setRole(USER);
         user.setPassword(passwordEncoder.encode(String.valueOf(userDto.password())));
-        userRepository.save(user);
+        var savedUser = userRepository.save(user);
+        profileService.createDefaultProfile(savedUser.getId());
 
-        return userMapper.toResponseDto(user);
+        eventPublisher.publishEvent(new AuditEventDto(savedUser.getId(), SIGN_UP_USER, "регистрация пользователя"));
+
+        return userMapper.toResponseDto(savedUser);
     }
 
     @Override
@@ -116,11 +138,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username)
-                .map(user -> new org.springframework.security.core.userdetails.User(
-                        user.getUsername(),
-                        user.getPassword(),
-                        Collections.singleton(user.getRole())
+        if (username == null || username.isBlank()) {
+            throw new UsernameNotFoundException("Пустой логин");
+        }
+
+        var usernameOrEmail = username.trim();
+        return userRepository.findByUsername(usernameOrEmail)
+                .or(() -> userRepository.findByEmail(usernameOrEmail))
+                .map(u -> new org.springframework.security.core.userdetails.User(
+                        u.getUsername(),
+                        u.getPassword(),
+                        Collections.singleton(u.getRole())
                 ))
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с username: '%s' не был найден".formatted(username)));
     }
