@@ -1,7 +1,8 @@
 package ru.matthew.NauJava.domain.crypto.generation;
 
 @FunctionalInterface
-public interface RandomGenerator {
+public interface RandomBytesGenerator {
+
     /**
      * Метод предназначенный для генерации последовательности случайных байт
      *

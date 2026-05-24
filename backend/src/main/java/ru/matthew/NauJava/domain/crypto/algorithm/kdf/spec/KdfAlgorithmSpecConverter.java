@@ -20,15 +20,20 @@ public class KdfAlgorithmSpecConverter implements AttributeConverter<KdfAlgorith
         if (string == null || string.isEmpty()) {
             return null;
         }
-        try {
-            return Argon2Spec.valueOf(string);
-        } catch (IllegalArgumentException e) {
-            try {
-                return Pbkdf2Spec.valueOf(string);
-            } catch (IllegalArgumentException ex) {
-                throw new KdfNotFoundException("Неизвестный kdf-алгоритм: " + string, ex);
+        // Ищем среди Argon2
+        for (Argon2Spec spec : Argon2Spec.values()) {
+            if (spec.getName().equals(string) || spec.name().equals(string)) {
+                return spec;
             }
         }
 
+        // Ищем среди Pbkdf2
+        for (Pbkdf2Spec spec : Pbkdf2Spec.values()) {
+            if (spec.getName().equals(string) || spec.name().equals(string)) {
+                return spec;
+            }
+        }
+
+        throw new KdfNotFoundException("Неизвестный kdf-алгоритм: " + string);
     }
 }

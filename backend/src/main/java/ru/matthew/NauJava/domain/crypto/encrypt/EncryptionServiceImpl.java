@@ -10,7 +10,7 @@ import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.KdfFactory;
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.SecretKeyGenerator;
 import ru.matthew.NauJava.domain.crypto.exception.EncryptionException;
-import ru.matthew.NauJava.domain.crypto.generation.RandomGenerator;
+import ru.matthew.NauJava.domain.crypto.generation.RandomBytesGenerator;
 
 import javax.crypto.SecretKey;
 import java.nio.ByteBuffer;
@@ -21,7 +21,7 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     private final CipherFactory cipherFactory;
     private final KdfFactory keyGeneratorFactory;
-    private final RandomGenerator randomGenerator = (arrayLength) -> {
+    private final RandomBytesGenerator randomBytesGenerator = (arrayLength) -> {
         byte[] randomBytes = new byte[arrayLength];
         new SecureRandom().nextBytes(randomBytes);
         return randomBytes;
@@ -39,8 +39,8 @@ public class EncryptionServiceImpl implements EncryptionService {
             SymmetricCipher cipher = cipherFactory.getCipher(cipherAlgorithm);
             SecretKeyGenerator secretKeyGenerator = keyGeneratorFactory.getSecretKeyGenerator(keyGenerator);
 
-            byte[] salt = randomGenerator.getRandomBytes(cipher.getSpec().getSaltLengthByte());
-            byte[] iv = randomGenerator.getRandomBytes(cipher.getSpec().getIvLengthByte());
+            byte[] salt = randomBytesGenerator.getRandomBytes(cipher.getSpec().getSaltLengthByte());
+            byte[] iv = randomBytesGenerator.getRandomBytes(cipher.getSpec().getIvLengthByte());
 
             SecretKey key = secretKeyGenerator.generateSecretKey(cipher.getSpec(), masterPassword, salt, iterations);
 
@@ -79,7 +79,7 @@ public class EncryptionServiceImpl implements EncryptionService {
             return cipher.decrypt(encryptedDataWithoutMeta, secretKey, iv);
 
         } catch (Exception e) {
-            throw new EncryptionException("Ошибка расшифровывания.", e);
+            throw new EncryptionException(e);
         }
     }
 }
