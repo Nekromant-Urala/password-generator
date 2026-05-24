@@ -5,6 +5,10 @@ public class PasswordEntryDecodeException extends RuntimeException {
         super(message, cause);
     }
 
+    public PasswordEntryDecodeException(Throwable cause) {
+        super(cause);
+    }
+
     public PasswordEntryDecodeException(String message) {
         super(message);
     }

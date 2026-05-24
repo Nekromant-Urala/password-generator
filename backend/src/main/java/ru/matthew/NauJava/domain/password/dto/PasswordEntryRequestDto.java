@@ -1,11 +1,9 @@
 package ru.matthew.NauJava.domain.password.dto;
 
-public record PasswordEntryCreateDto (
+public record PasswordEntryRequestDto(
         String login,
         char[] password,
         String serviceName,
         String description,
-        String cipherSpec,
-        String kdfSpec,
-        int iterations
+        String profileName
 ) {}
