@@ -2,9 +2,7 @@ package ru.matthew.NauJava.domain.user.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.matthew.NauJava.domain.user.User;
-import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
-import ru.matthew.NauJava.domain.user.dto.UserForPasswordEntryDto;
-import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
+import ru.matthew.NauJava.domain.user.dto.*;
 
 @Component
 public class UserMapper {
@@ -19,16 +17,24 @@ public class UserMapper {
         return user;
     }
 
-    public User toUser(UserResponseDto dto) {
-        if (dto == null) {
-            return null;
+    public void updateEntityFromPatchDto(User user, UserPatchDto dto) {
+        if (user == null || dto == null) {
+            return;
         }
-        User user = new User();
-        user.setId(dto.id());
+        if (dto.username() != null) {
+            user.setUsername(dto.username());
+        }
+        if (dto.email() != null) {
+            user.setEmail(dto.email());
+        }
+    }
+
+    public void updateEntityFromUpdateFullDto(User user, UserUpdateFullDto dto) {
+        if (user == null || dto == null) {
+            return;
+        }
         user.setUsername(dto.username());
         user.setEmail(dto.email());
-        user.setRole(dto.role());
-        return user;
     }
 
     public UserResponseDto toResponseDto(User user) {

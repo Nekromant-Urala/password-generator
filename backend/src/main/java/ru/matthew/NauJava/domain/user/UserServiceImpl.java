@@ -8,11 +8,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
 import ru.matthew.NauJava.domain.profile.GeneratorProfileService;
-import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
+import ru.matthew.NauJava.domain.user.dto.*;
+import ru.matthew.NauJava.domain.user.exception.UserPasswordMissMatchException;
 import ru.matthew.NauJava.domain.user.mapper.UserMapper;
-import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
@@ -103,37 +104,45 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserResponseDto updateEmail(Long id, String email) {
+    public UserResponseDto patchUser(Long id, UserPatchDto dto) {
         var user = userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении email".formatted(id))
+                () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при частичном обновлении данных".formatted(id))
         );
-        user.setEmail(email);
-        userRepository.save(user);
+        userMapper.updateEntityFromPatchDto(user, dto);
+
         return userMapper.toResponseDto(user);
     }
 
     @Override
-    public UserResponseDto updateUsername(Long id, String username) {
+    public UserResponseDto updateFullUser(Long id, UserUpdateFullDto dto) {
         var user = userRepository.findById(id).orElseThrow(
-                () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении username".formatted(id))
+                () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении всех данных".formatted(id))
         );
-        user.setUsername(username);
-        userRepository.save(user);
+        userMapper.updateEntityFromUpdateFullDto(user, dto);
+
         return userMapper.toResponseDto(user);
     }
 
+
     @Override
-    public UserResponseDto updatePassword(Long id, char[] password) {
+    public UserResponseDto updatePassword(Long id, UserUpdatePasswordDto dto) {
         var user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при обновлении password".formatted(id))
         );
+        var newPassword = dto.newPassword();
+        var oldPassword = dto.oldPassword();
+
         try {
-            user.setPassword(passwordEncoder.encode(String.valueOf(password)));
-            userRepository.save(user);
+            if (passwordEncoder.matches(String.valueOf(oldPassword), user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(String.valueOf(dto.newPassword())));
+                return userMapper.toResponseDto(user);
+            } else {
+                throw new UserPasswordMissMatchException("Несоответствие старого пароля");
+            }
         } finally {
-            Arrays.fill(password, '\0');
+            Arrays.fill(newPassword, '\0');
+            Arrays.fill(oldPassword, '\0');
         }
-        return userMapper.toResponseDto(user);
     }
 
     @Override
@@ -157,5 +166,4 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
-
 }

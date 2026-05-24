@@ -13,7 +13,7 @@ import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
 import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthRestController {
     private final UserService userService;
 
@@ -27,6 +27,4 @@ public class AuthRestController {
         var userDto = userService.createUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
-
-
 }

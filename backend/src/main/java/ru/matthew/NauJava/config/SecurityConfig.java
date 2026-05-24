@@ -30,7 +30,7 @@ public class SecurityConfig {
     private static final String[] ADMIN_ONLY_REQUESTS = {
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/api/**",
+            "/api/v1/**",
             "/reports/**"
     };
 
