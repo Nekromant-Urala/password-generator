@@ -15,8 +15,8 @@ public record GeneratorProfileCreateDto(
         boolean isAvoidAmbiguousChars,
         boolean isFavorite,
         String customChars,
-        User user,
-        KdfAlgorithmSpec kdfAlgorithm,
-        CipherAlgorithmSpec cipher
+        String kdfAlgorithm,
+        String cipher,
+        Integer iterations
 ) {
 }
