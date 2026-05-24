@@ -13,11 +13,12 @@ public record GeneratorProfileResponseDto(
         boolean isLowercase,
         boolean isDigits,
         boolean isSpecialChars,
-        boolean isAvoidAmbiguousChars,
+        boolean isDuplicateChars,
         boolean isFavorite,
         String customChars,
         LocalDateTime createAt,
         KdfAlgorithmSpec kdfAlgorithm,
-        CipherAlgorithmSpec cipher
+        CipherAlgorithmSpec cipher,
+        Integer iterations
 ) {
 }

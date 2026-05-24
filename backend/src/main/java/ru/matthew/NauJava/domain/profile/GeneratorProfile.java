@@ -9,6 +9,7 @@ import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
 
+//TODO при удалении сущности, записи зашифрованные с помощью него будут не доступны (если изменяться параметры итерации или алгоритмов)
 @Entity
 @Table(name = "generator_profile")
 public class GeneratorProfile {
@@ -37,7 +38,7 @@ public class GeneratorProfile {
     private boolean isSpecialChars;
 
     @Column(name = "avoid_ambiguous_chars")
-    private boolean isAvoidAmbiguousChars;
+    private boolean isDuplicateChars;
 
     @Column(name = "is_favorite")
     private boolean isFavorite;
@@ -53,13 +54,114 @@ public class GeneratorProfile {
     @Convert(converter = KdfAlgorithmSpecConverter.class)
     private KdfAlgorithmSpec kdfAlgorithm;
 
-    @Column(name = "algorithm_id")
+    @Column(name = "cipher_algorithm")
     @Enumerated(value = EnumType.STRING)
     private CipherAlgorithmSpec cipher;
+
+    @Column(name = "iterations")
+    private Integer iterations;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    protected GeneratorProfile() {
+    }
+
+    public GeneratorProfile(GeneratorProfileBuilder builder) {
+        this.name = builder.name;
+        this.passwordLength = builder.passwordLength;
+        this.isUppercase = builder.isUppercase;
+        this.isLowercase = builder.isLowercase;
+        this.isDigits = builder.isDigits;
+        this.isSpecialChars = builder.isSpecialChars;
+        this.isDuplicateChars = builder.isAvoidAmbiguousChars;
+        this.isFavorite = builder.isFavorite;
+        this.customChars = builder.customChars;
+        this.kdfAlgorithm = builder.kdfAlgorithm;
+        this.cipher = builder.cipher;
+        this.iterations = builder.iterations;
+    }
+
+    public static class GeneratorProfileBuilder {
+        private String name;
+        private Integer passwordLength;
+        private boolean isUppercase;
+        private boolean isLowercase;
+        private boolean isDigits;
+        private boolean isSpecialChars;
+        private boolean isAvoidAmbiguousChars;
+        private boolean isFavorite;
+        private String customChars;
+        private KdfAlgorithmSpec kdfAlgorithm;
+        private CipherAlgorithmSpec cipher;
+        private Integer iterations;
+
+        public GeneratorProfileBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public GeneratorProfileBuilder passwordLength(Integer passwordLength) {
+            this.passwordLength = passwordLength;
+            return this;
+        }
+
+        public GeneratorProfileBuilder uppercase(boolean uppercase) {
+            isUppercase = uppercase;
+            return this;
+        }
+
+        public GeneratorProfileBuilder lowercase(boolean lowercase) {
+            isLowercase = lowercase;
+            return this;
+        }
+
+        public GeneratorProfileBuilder digits(boolean digits) {
+            isDigits = digits;
+            return this;
+        }
+
+        public GeneratorProfileBuilder specialChars(boolean specialChars) {
+            isSpecialChars = specialChars;
+            return this;
+        }
+
+        public GeneratorProfileBuilder avoidAmbiguousChars(boolean avoidAmbiguousChars) {
+            isAvoidAmbiguousChars = avoidAmbiguousChars;
+            return this;
+        }
+
+        public GeneratorProfileBuilder favorite(boolean favorite) {
+            isFavorite = favorite;
+            return this;
+        }
+
+        public GeneratorProfileBuilder customChars(String customChars) {
+            this.customChars = customChars;
+            return this;
+        }
+
+        public GeneratorProfileBuilder kdfAlgorithm(KdfAlgorithmSpec kdfAlgorithm) {
+            this.kdfAlgorithm = kdfAlgorithm;
+            return this;
+        }
+
+        public GeneratorProfileBuilder cipher(CipherAlgorithmSpec cipher) {
+            this.cipher = cipher;
+            return this;
+        }
+
+        public GeneratorProfileBuilder iterations(Integer iterations) {
+            this.iterations = iterations;
+            return this;
+        }
+
+        public GeneratorProfile build() {
+            return new GeneratorProfile(this);
+        }
+    }
+
 
     public Long getId() {
         return id;
@@ -117,12 +219,12 @@ public class GeneratorProfile {
         isSpecialChars = specialChars;
     }
 
-    public boolean isAvoidAmbiguousChars() {
-        return isAvoidAmbiguousChars;
+    public boolean isDuplicateChars() {
+        return isDuplicateChars;
     }
 
-    public void setAvoidAmbiguousChars(boolean avoidAmbiguousChars) {
-        isAvoidAmbiguousChars = avoidAmbiguousChars;
+    public void setDuplicateChars(boolean duplicateChars) {
+        isDuplicateChars = duplicateChars;
     }
 
     public boolean isFavorite() {
@@ -171,5 +273,13 @@ public class GeneratorProfile {
 
     public void setCipher(CipherAlgorithmSpec cipher) {
         this.cipher = cipher;
+    }
+
+    public Integer getIterations() {
+        return iterations;
+    }
+
+    public void setIterations(Integer iterations) {
+        this.iterations = iterations;
     }
 }
