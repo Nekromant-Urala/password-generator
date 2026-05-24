@@ -19,7 +19,7 @@ public class UserMapper {
         return user;
     }
 
-    public User toUser(UserForPasswordEntryDto dto) {
+    public User toUser(UserResponseDto dto) {
         if (dto == null) {
             return null;
         }
@@ -27,6 +27,7 @@ public class UserMapper {
         user.setId(dto.id());
         user.setUsername(dto.username());
         user.setEmail(dto.email());
+        user.setRole(dto.role());
         return user;
     }
 
@@ -42,17 +43,4 @@ public class UserMapper {
                 user.getRole()
         );
     }
-
-    public UserForPasswordEntryDto toUserForPasswordEntryDto(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        return new UserForPasswordEntryDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail()
-        );
-    }
-
 }

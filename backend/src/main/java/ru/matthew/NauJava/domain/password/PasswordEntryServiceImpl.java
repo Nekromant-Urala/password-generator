@@ -1,74 +1,168 @@
 package ru.matthew.NauJava.domain.password;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
 import ru.matthew.NauJava.domain.crypto.encrypt.EncryptionService;
-import ru.matthew.NauJava.domain.password.dto.PasswordEntryCreateDto;
-import ru.matthew.NauJava.domain.password.dto.PasswordEntrySpecDto;
+import ru.matthew.NauJava.domain.crypto.exception.EncryptionException;
+import ru.matthew.NauJava.domain.crypto.generation.RandomGeneratorService;
+import ru.matthew.NauJava.domain.password.dto.PasswordResponseDto;
+import ru.matthew.NauJava.domain.password.dto.PasswordEntryRequestDto;
 import ru.matthew.NauJava.domain.password.dto.PasswordEntryResponseDto;
+import ru.matthew.NauJava.domain.password.dto.PasswordEntryUpdateDto;
+import ru.matthew.NauJava.domain.password.exception.PasswordEntryDecodeException;
 import ru.matthew.NauJava.domain.password.exception.PasswordEntryNotFoundException;
 import ru.matthew.NauJava.domain.password.mapper.PasswordEntryMapper;
+import ru.matthew.NauJava.domain.profile.GeneratorProfileRepository;
+import ru.matthew.NauJava.domain.profile.exception.ProfileNotFoundException;
+import ru.matthew.NauJava.domain.profile.mapper.GeneratorProfileMapper;
+import ru.matthew.NauJava.domain.user.UserRepository;
+import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
+import java.nio.charset.CharacterCodingException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static ru.matthew.NauJava.common.utils.ConverterUtils.charsToBytes;
+import static ru.matthew.NauJava.common.utils.ConverterUtils.*;
+import static ru.matthew.NauJava.domain.audit.EventType.*;
 
 @Service
 @Transactional
 public class PasswordEntryServiceImpl implements PasswordEntryService {
 
+    private final UserRepository userRepository;
+    private final GeneratorProfileRepository profileRepository;
+
+    private final EncryptionService encryptionService;
+    private final RandomGeneratorService generatorService;
+
+    private final GeneratorProfileMapper profileMapper;
     private final PasswordEntryMapper passwordEntryMapper;
     private final PasswordEntryRepository passwordEntryRepository;
-    private final EncryptionService encryptionService;
+
+    private final ApplicationEventPublisher eventPublisher;
+
 
     @Autowired
-    public PasswordEntryServiceImpl(PasswordEntryMapper passwordEntryMapper, PasswordEntryRepository passwordEntryRepository, EncryptionService encryptionService) {
+    public PasswordEntryServiceImpl(
+            PasswordEntryMapper passwordEntryMapper,
+            UserRepository userRepository,
+            PasswordEntryRepository passwordEntryRepository,
+            EncryptionService encryptionService,
+            GeneratorProfileRepository profileRepository, RandomGeneratorService generatorService, GeneratorProfileMapper profileMapper,
+            ApplicationEventPublisher eventPublisher
+    ) {
         this.passwordEntryMapper = passwordEntryMapper;
+        this.userRepository = userRepository;
+        this.generatorService = generatorService;
+        this.profileMapper = profileMapper;
+        this.eventPublisher = eventPublisher;
         this.passwordEntryRepository = passwordEntryRepository;
         this.encryptionService = encryptionService;
+        this.profileRepository = profileRepository;
     }
 
     @Override
-    public PasswordEntryResponseDto createPasswordEntry(PasswordEntryCreateDto dto) {
+    public PasswordEntryResponseDto createPasswordEntry(Long userId, PasswordEntryRequestDto dto) {
         var entry = passwordEntryMapper.toPasswordEntry(dto);
+        var user = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException(userId)
+        );
 
-        entry.setPassword(Arrays.toString(
-                encryptionService.encrypt(
-                        charsToBytes(dto.password()),
-                        dto.password(),
-                        dto.cipherSpec(),
-                        dto.kdfSpec(),
-                        dto.iterations())
-        ));
+        var profile = profileRepository.findByUserIdAndName(userId, dto.profileName())
+                .orElse(profileRepository.findByUserIdAndName(userId, "default")
+                        .orElseThrow(
+                                () -> new ProfileNotFoundException("Не удалось подобрать необходимый профайл для создания пароля")
+                        ));
 
-        passwordEntryRepository.save(entry);
-        return passwordEntryMapper.toPasswordEntryResponseDto(entry);
+        entry.setUser(user);
+        entry.setProfile(profile);
+        user.addPasswordEntries(entry);
+
+        char[] password = dto.password();
+        if (password == null || password.length == 0) {
+            password = generatorService.generatePassword(profileMapper.toProfileForPasswordDto(profile));
+        }
+
+        try {
+            entry.setPassword(bytesToString(
+                    encryptionService.encrypt(
+                            charsToBytes(password),
+                            user.getPassword().toCharArray(),
+                            profile.getCipher(),
+                            profile.getKdfAlgorithm(),
+                            profile.getIterations()
+                    )
+            ));
+
+            passwordEntryRepository.save(entry);
+
+            eventPublisher.publishEvent(new AuditEventDto(userId, CREATE_ENTRY, "Создание записи данных"));
+
+            return passwordEntryMapper.toPasswordEntryResponseDto(entry);
+        } catch (CharacterCodingException e) {
+            throw new PasswordEntryDecodeException("Ошибка при записи пароля.", e);
+        } finally {
+            Arrays.fill(password, '\0');
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public PasswordEntryResponseDto findById(Long id) {
         return passwordEntryRepository.findById(id).map(passwordEntryMapper::toPasswordEntryResponseDto).orElseThrow(
-                () -> new PasswordEntryNotFoundException("Запись с таким id: '%d' не была найдена.".formatted(id))
+                () -> new PasswordEntryNotFoundException(id)
         );
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PasswordEntryResponseDto> findByServiceName(String serviceName) {
-        return passwordEntryRepository.findByServiceName(serviceName).stream()
+    public Page<PasswordEntryResponseDto> findByServiceName(Long userId, String serviceName, Pageable pageable) {
+        return passwordEntryRepository.findAllByUserIdAndServiceName(userId, serviceName, pageable)
+                .map(passwordEntryMapper::toPasswordEntryResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PasswordEntryResponseDto> findByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+        return passwordEntryRepository.findAllByUserIdAndCreatedAtBetween(userId, startDate, endDate, pageable)
+                .map(passwordEntryMapper::toPasswordEntryResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PasswordEntryResponseDto> findByCreatedAt(Long userId, LocalDateTime createdAt, Pageable pageable) {
+        return passwordEntryRepository.findAllByUserIdAndCreatedAt(userId, createdAt, pageable)
+                .map(passwordEntryMapper::toPasswordEntryResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PasswordEntryResponseDto> findByUpdatedAt(Long userId, LocalDateTime updatedAt, Pageable pageable) {
+        return passwordEntryRepository.findAllByUserIdAndUpdatedAt(userId, updatedAt, pageable)
+                .map(passwordEntryMapper::toPasswordEntryResponseDto);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PasswordEntryResponseDto> findAllForUser(Long userId) {
+        return passwordEntryRepository.findByUserId(userId).stream()
                 .map(passwordEntryMapper::toPasswordEntryResponseDto)
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<PasswordEntryResponseDto> findByUserId(Long userId) {
-        return passwordEntryRepository.findByUserId(userId).stream()
-                .map(passwordEntryMapper::toPasswordEntryResponseDto)
-                .toList();
+    public Page<PasswordEntryResponseDto> findAllByPageForUser(Long userId, Pageable pageable) {
+        return passwordEntryRepository.findByUserId(userId, pageable)
+                .map(passwordEntryMapper::toPasswordEntryResponseDto);
     }
 
     @Override
@@ -80,59 +174,85 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     }
 
     @Override
-    public PasswordEntryResponseDto updateLogin(Long id, String login) {
+    @Transactional(readOnly = true)
+    public long countAllEntryByUserId(Long userId) {
+        return passwordEntryRepository.countAllByUserId(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PasswordResponseDto revealPassword(Long id) {
         var entry = passwordEntryRepository.findById(id).orElseThrow(
-                () -> new PasswordEntryNotFoundException("Запись с таким id: '%d' не была найдена.".formatted(id))
+                () -> new PasswordEntryNotFoundException(id)
         );
-        entry.setLogin(login);
-        passwordEntryRepository.save(entry);
-        return passwordEntryMapper.toPasswordEntryResponseDto(entry);
+        try {
+            var profile = entry.getProfile();
+
+            return new PasswordResponseDto(bytesToChars(encryptionService.decrypt(
+                    charsToBytes(entry.getPassword().toCharArray()),
+                    entry.getUser().getPassword().toCharArray(),
+                    profile.getCipher(),
+                    profile.getKdfAlgorithm(),
+                    profile.getIterations()
+            )));
+        } catch (EncryptionException e) {
+            throw new PasswordEntryDecodeException(e);
+        }
     }
 
     @Override
-    public PasswordEntryResponseDto updateServiceName(Long id, String serviceName) {
-        var entry = passwordEntryRepository.findById(id).orElseThrow(
-                () -> new PasswordEntryNotFoundException("Запись с таким id: '%d' не была найдена.".formatted(id))
+    public PasswordEntryResponseDto updateAllEntry(Long id, PasswordEntryUpdateDto dto) {
+        var oldEntry = passwordEntryRepository.findById(id).orElseThrow(
+                () -> new PasswordEntryNotFoundException(id)
         );
-        entry.setServiceName(serviceName);
-        passwordEntryRepository.save(entry);
-        return passwordEntryMapper.toPasswordEntryResponseDto(entry);
+
+        var newEntry = passwordEntryMapper.toPasswordEntry(oldEntry, dto);
+        var profile = newEntry.getProfile();
+
+        try {
+            // подумать над валидацией пустого поля пароля (пользователь оставил старый пароль)
+            if (dto.password() != null && dto.password().length > 0) {
+                newEntry.setPassword(bytesToString(
+                        encryptionService.encrypt(
+                                charsToBytes(dto.password()),
+                                newEntry.getUser().getPassword().toCharArray(),
+                                profile.getCipher(),
+                                profile.getKdfAlgorithm(),
+                                profile.getIterations()
+                        )));
+            } else {
+                newEntry.setPassword(oldEntry.getPassword());
+            }
+
+            eventPublisher.publishEvent(new AuditEventDto(newEntry.getUser().getId(), UPDATE_ENTRY, "обновление данных записи"));
+
+            return passwordEntryMapper.toPasswordEntryResponseDto(newEntry);
+        } catch (CharacterCodingException e) {
+            throw new PasswordEntryDecodeException("Ошибка при записи пароля.", e);
+        }
     }
 
     @Override
-    public PasswordEntryResponseDto updateDescription(Long id, String description) {
-        var entry = passwordEntryRepository.findById(id).orElseThrow(
-                () -> new PasswordEntryNotFoundException("Запись с таким id: '%d' не была найдена.".formatted(id))
-        );
-        entry.setDescription(description);
-        passwordEntryRepository.save(entry);
-        return passwordEntryMapper.toPasswordEntryResponseDto(entry);
+    public void deleteByUserId(Long userId) {
+        passwordEntryRepository.deleteByUserId(userId);
+        eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_ENTRY, "удаление всех записей пользователя"));
     }
 
     @Override
-    public PasswordEntryResponseDto updatePassword(Long id, PasswordEntrySpecDto dto) {
-        var entry = passwordEntryRepository.findById(id).orElseThrow(
-                () -> new PasswordEntryNotFoundException("Запись с таким id: '%d' не была найдена.".formatted(id))
-        );
-        entry.setPassword(Arrays.toString(
-                encryptionService.encrypt(
-                        charsToBytes(dto.password()),
-                        dto.password(),
-                        dto.cipherSpec(),
-                        dto.kdfSpec(),
-                        dto.iterations())
-        ));
-        passwordEntryRepository.save(entry);
-        return passwordEntryMapper.toPasswordEntryResponseDto(entry);
+    public void deleteByServiceName(Long userId, String serviceName) {
+        passwordEntryRepository.deleteAllByUserIdAndServiceName(userId, serviceName);
+        eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_ENTRY, "удаление всех записей по указанному сервису"));
     }
 
     @Override
-    public void deleteByServiceName(Long id, String serviceName) {
-        passwordEntryRepository.deleteByServiceName(serviceName);
+    public void deleteByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate) {
+        passwordEntryRepository.deleteAllByUserIdAndCreatedAtBetween(userId, startDate, endDate);
+        eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_ENTRY, "удаление всех записей в заданных временных рамках"));
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Long userId, Long id) {
         passwordEntryRepository.deleteById(id);
+        eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_ENTRY, "удаление конкретной записи"));
     }
 }

@@ -2,6 +2,9 @@ package ru.matthew.NauJava.domain.password;
 
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import ru.matthew.NauJava.domain.profile.GeneratorProfile;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -17,28 +20,30 @@ public class PasswordEntry {
     @Column(name = "login")
     private String login;
 
-    @Column(name = "encrypt_password")
+    @Column(name = "encrypt_password", columnDefinition = "TEXT")
     private String password;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "service_name")
     private String serviceName;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    public PasswordEntry() {
-        createdAt = LocalDateTime.now();
-    }
+    @ManyToOne
+    @JoinColumn(name = "profile_id")
+    private GeneratorProfile profile;
 
     public Long getId() {
         return id;
@@ -102,5 +107,13 @@ public class PasswordEntry {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public GeneratorProfile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(GeneratorProfile profile) {
+        this.profile = profile;
     }
 }

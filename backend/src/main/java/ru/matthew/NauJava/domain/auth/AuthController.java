@@ -1,32 +1,40 @@
 package ru.matthew.NauJava.domain.auth;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
-import ru.matthew.NauJava.domain.user.UserService;
-import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
 
-@RestController
-@RequestMapping("/api/auth")
+@Controller
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthenticationService authenticationService;
 
     @Autowired
-    public AuthController(UserService userService) {
-        this.userService = userService;
+    public AuthController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> register(@RequestBody UserCreateDto dto) {
-        var userDto = userService.createUser(dto);
-        return new ResponseEntity<>(userDto, HttpStatus.CREATED);
+    @GetMapping("/sign-in")
+    public String signIn() {
+        return "/auth/sign-in";
     }
 
+    @GetMapping("/sign-up")
+    public String signUp() {
+        return "/auth/sign-up";
+    }
+
+    @PostMapping("/sign-up")
+    public String singUp(@ModelAttribute UserCreateDto user, RedirectAttributes redirectAttributes) {
+        try {
+            authenticationService.singUp(user);
+            redirectAttributes.addFlashAttribute("success", "Регистрация успешна! Войдите в систему.");
+            return "redirect:/sign-in";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/sign-up";
+        }
+    }
 }

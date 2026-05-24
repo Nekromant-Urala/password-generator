@@ -2,6 +2,7 @@ package ru.matthew.NauJava.domain.crypto.algorithm.cipher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.exception.CipherNotFoundException;
 
 import java.util.List;

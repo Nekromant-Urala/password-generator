@@ -1,7 +1,7 @@
 package ru.matthew.NauJava.domain.crypto.algorithm.cipher.implementation;
 
 import org.springframework.stereotype.Component;
-import ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.algorithm.cipher.SymmetricCipher;
 import ru.matthew.NauJava.domain.crypto.exception.EncryptionException;
 
@@ -9,7 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
-import static ru.matthew.NauJava.domain.crypto.algorithm.cipher.CipherAlgorithmSpec.AES;
+import static ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec.AES;
 
 @Component
 public class AdvancedEncryptionStandard implements SymmetricCipher {
@@ -22,7 +22,7 @@ public class AdvancedEncryptionStandard implements SymmetricCipher {
             cipher.init(Cipher.ENCRYPT_MODE, key, gcmSpec);
             return cipher.doFinal(byteArrayToEncrypt);
         } catch (Exception e) {
-            throw new EncryptionException("Ошибка при шифровании данных алгоритмом AES. ", e);
+            throw new EncryptionException(e);
         }
     }
 
@@ -34,7 +34,7 @@ public class AdvancedEncryptionStandard implements SymmetricCipher {
             cipher.init(Cipher.DECRYPT_MODE, key, gcmSpec);
             return cipher.doFinal(byteArrayToDecrypt);
         } catch (Exception e) {
-            throw new EncryptionException("Ошибка при расшифровывании данных алгоритмом AES. ", e);
+            throw new EncryptionException(e);
         }
     }
 

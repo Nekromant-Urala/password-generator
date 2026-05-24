@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои пароли</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<button type="button" class="menu-trigger-btn" title="Профиль">☰</button>
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<aside id="userSidebar" class="vault-sidebar">
+    <button type="button" class="close-sidebar-btn">&times;</button>
+    <h2>Пользователь</h2>
+    <div class="user-meta">
+        <div><span>Логин:</span> <strong th:text="${username}">user</strong></div>
+        <div><span>Email:</span> <strong th:text="${userEmail}">user@mail.com</strong></div>
+        <div><span>Роль:</span> <strong th:text="${userRole}">USER</strong></div>
+    </div>
+
+    <div class="sidebar-nav" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+        <a th:href="@{/profiles}" class="btn-secondary" style="text-align: center; text-decoration: none; padding: 8px;">Настройки генерации</a>
+        <a th:if="${#strings.containsIgnoreCase(userRole, 'ADMIN')}" th:href="@{/audit}" class="btn-secondary" style="text-align: center; text-decoration: none; padding: 8px;">Аудит и статистика</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post" class="vault-actions">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <button type="submit" class="btn-secondary" style="width: 100%;">Выйти</button>
+    </form>
+</aside>
+
+<div class="vault-wrapper">
+    <div class="vault-layout">
+        <main class="vault-content">
+            <header class="vault-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="margin-bottom: 4px;">Мои пароли</h1>
+                    <p class="vault-subtitle" style="margin-bottom: 0;">Управление записями и безопасное хранение</p>
+                </div>
+                <button type="button" class="btn-primary js-vault-open-create">➕ Добавить запись</button>
+            </header>
+
+            <p class="vault-success" th:if="${vaultSuccess}" th:text="${vaultSuccess}"></p>
+            <p class="vault-error" th:if="${vaultError}" th:text="${vaultError}"></p>
+
+            <div class="vault-table-panel" th:if="${passwordPage.totalElements > 0}">
+                <div class="vault-table-wrap">
+                    <table class="vault-table">
+                        <thead>
+                        <tr>
+                            <th>Сервис</th>
+                            <th>Логин</th>
+                            <th>Пароль</th>
+                            <th>Описание</th>
+                            <th>Создано</th>
+                            <th>Обновлено</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="entry : ${entries}">
+                            <td th:text="${entry.serviceName()}"></td>
+                            <td th:text="${entry.login()}"></td>
+                            <td th:text="${revealedEntryId != entry.id() ? '********' : revealedPassword}"></td>
+                            <td th:text="${entry.description() != null ? entry.description() : ''}"></td>
+                            <td th:text="${entry.createdAt() != null ? #temporals.format(entry.createdAt(), 'dd.MM.yyyy HH:mm') : '—'}">—</td>
+                            <td th:text="${entry.updatedAt() != null ? #temporals.format(entry.updatedAt(), 'dd.MM.yyyy HH:mm') : '—'}">—</td>
+                            <td>
+                                <div class="vault-actions-row">
+                                    <form method="post" style="display: inline-flex;" th:if="${revealedEntryId != entry.id()}">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="icon-btn" title="Показать пароль"
+                                                th:formaction="@{/passwords/{id}/reveal(id=${entry.id()})}">👁️</button>
+                                    </form>
+                                    <a th:if="${revealedEntryId == entry.id()}" th:href="@{/passwords(page=${currentPage})}" class="icon-btn" title="Скрыть пароль">👁️‍🗨️</a>
+
+                                    <button type="button" class="icon-btn js-vault-open-edit" title="Редактировать"
+                                            th:attr="data-id=${entry.id()}, data-service=${entry.serviceName()}, data-login=${entry.login()}, data-desc=${entry.description()}">✏️</button>
+
+                                    <form th:action="@{/passwords/{id}/delete(id=${entry.id()})}" method="post"
+                                          class="js-vault-delete-form"
+                                          style="display: inline-flex;">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="icon-btn delete-btn" title="Удалить">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav class="vault-pagination" th:if="${passwordPage.totalPages > 1}" aria-label="Страницы списка паролей">
+                    <div class="vault-pagination__inner">
+                        <a class="vault-page-arrow"
+                           th:unless="${passwordPage.first}"
+                           th:href="@{/passwords(page=0)}"
+                           title="Первая страница">«</a>
+                        <span class="vault-page-arrow vault-page-arrow--disabled" th:if="${passwordPage.first}" title="Первая страница">«</span>
+                        <a class="vault-page-arrow"
+                           th:unless="${passwordPage.first}"
+                           th:href="@{/passwords(page=${passwordPage.number - 1})}"
+                           title="Предыдущая страница">‹</a>
+                        <span class="vault-page-arrow vault-page-arrow--disabled" th:if="${passwordPage.first}" title="Предыдущая страница">‹</span>
+                        <span class="vault-pagination__status"
+                              th:text="|${passwordPage.number + 1} / ${passwordPage.totalPages}|">1 / 1</span>
+                        <a class="vault-page-arrow"
+                           th:unless="${passwordPage.last}"
+                           th:href="@{/passwords(page=${passwordPage.number + 1})}"
+                           title="Следующая страница">›</a>
+                        <span class="vault-page-arrow vault-page-arrow--disabled" th:if="${passwordPage.last}" title="Следующая страница">›</span>
+                        <a class="vault-page-arrow"
+                           th:unless="${passwordPage.last}"
+                           th:href="@{/passwords(page=${passwordPage.totalPages - 1})}"
+                           title="Последняя страница">»</a>
+                        <span class="vault-page-arrow vault-page-arrow--disabled" th:if="${passwordPage.last}" title="Последняя страница">»</span>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="vault-empty" th:if="${passwordPage.totalElements == 0}">
+                <p>Пока нет сохранённых записей паролей.</p>
+                <button type="button" class="btn-primary js-vault-open-create" style="margin-top: 15px;">Создать первую запись</button>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div id="entryModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2 id="modalTitle">Добавить запись</h2>
+
+        <form id="entryForm" th:action="@{/passwords/create}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden" name="page" id="vaultFormPage" th:value="${currentPage}"/>
+
+            <div class="input-field">
+                <input type="text" id="modalService" name="serviceName" required/>
+                <label>Сервис</label>
+            </div>
+
+            <div class="input-field">
+                <input type="text" id="modalLogin" name="login" required/>
+                <label>Логин</label>
+            </div>
+
+            <div class="input-field">
+                <input type="password" id="modalPassword" name="password"/>
+                <label id="modalPasswordLabel">Пароль</label>
+            </div>
+
+            <div class="input-field">
+                <input type="text" id="modalDesc" name="description" required/>
+                <label>Описание</label>
+            </div>
+
+            <div class="input-field">
+                <input type="text" id="modalProfileName" name="profileName"/>
+                <label>Имя профиля генерации</label>
+            </div>
+
+            <button type="submit" style="width: 100%; margin-top: 15px;">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<script defer th:src="@{/js/entry.js}"></script>
+</body>
+</html>
