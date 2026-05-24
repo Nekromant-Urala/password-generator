@@ -16,7 +16,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void register(UserCreateDto user) {
+    public void singUp(UserCreateDto user) {
         userService.createUser(user);
     }
 }

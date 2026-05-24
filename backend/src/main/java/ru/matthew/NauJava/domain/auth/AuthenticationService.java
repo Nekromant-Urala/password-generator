@@ -5,8 +5,9 @@ import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
 public interface AuthenticationService {
 
     /**
+     * Регистрация нового пользователя
      *
-     * @param user
+     * @param user объект типа {@link UserCreateDto} содержащий данные для создания пользователя
      */
-    void register(UserCreateDto user);
+    void singUp(UserCreateDto user);
 }

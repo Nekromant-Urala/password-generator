@@ -18,32 +18,18 @@ public class AuthController {
 
     @GetMapping("/sign-in")
     public String signIn() {
-        return "auth/sign-in";
+        return "/auth/sign-in";
     }
 
     @GetMapping("/sign-up")
     public String signUp() {
-        return "auth/sign-up";
+        return "/auth/sign-up";
     }
 
-//    @PostMapping("/sign-in")
-//    public String login(@ModelAttribute UserLoginDto loginRequest,
-//                        RedirectAttributes redirectAttributes) {
-//        try {
-//            String token = authService.login(loginRequest);
-//            redirectAttributes.addFlashAttribute("success", "Вход выполнен успешно");
-//            return "redirect:/passwords/mock";
-//        } catch (Exception e) {
-//            redirectAttributes.addFlashAttribute("error", e.getMessage());
-//            return "redirect:/sign-in";
-//        }
-//    }
-
     @PostMapping("/sign-up")
-    public String register(@ModelAttribute UserCreateDto user,
-                           RedirectAttributes redirectAttributes) {
+    public String singUp(@ModelAttribute UserCreateDto user, RedirectAttributes redirectAttributes) {
         try {
-            authenticationService.register(user);
+            authenticationService.singUp(user);
             redirectAttributes.addFlashAttribute("success", "Регистрация успешна! Войдите в систему.");
             return "redirect:/sign-in";
         } catch (Exception e) {
