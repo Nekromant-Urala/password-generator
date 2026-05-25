@@ -3,8 +3,8 @@ package ru.matthew.NauJava.domain.audit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.matthew.NauJava.domain.audit.dto.AuditCreateDto;
-import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
 import ru.matthew.NauJava.domain.audit.dto.AuditResponseDto;
+import ru.matthew.NauJava.domain.audit.dto.AuditStatsResponseDto;
 
 import java.time.LocalDateTime;
 
@@ -73,7 +73,7 @@ public interface AuditService {
      *
      * @return количество всех событий в системе
      */
-    long countAll();
+    long countAllEvent();
 
     /**
      * Подсчитывает количество всех пользователей в системе
@@ -94,7 +94,15 @@ public interface AuditService {
      *
      * @return количество сгенерированных записей за все время
      */
-    long countAllPasswordEntry();
+    long countAllPasswordEntries();
+
+    /**
+     * Производит подсчет всех данных системы.
+     * (Количество пользователей, сгенерированных-записей, пользователей за последний день, количество произошедших событий)
+     *
+     * @return Возвращает данные о системе в качестве {@link AuditStatsResponseDto}
+     */
+    AuditStatsResponseDto getAllStatsSystem();
 
     /**
      * Удаление записи аудита по её уникальному идентификатору.
@@ -123,11 +131,4 @@ public interface AuditService {
      * @param createdAt дата и время создания.
      */
     void deleteByCreatedAt(LocalDateTime createdAt);
-
-    /**
-     * Удаление записей аудита по-указанному User-Agent.
-     *
-     * @param userAgent строка User-Agent.
-     */
-    void deleteByUserAgent(String userAgent);
 }

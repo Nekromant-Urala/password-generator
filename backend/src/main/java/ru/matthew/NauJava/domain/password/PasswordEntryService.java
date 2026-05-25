@@ -104,7 +104,7 @@ public interface PasswordEntryService {
      * @param dto данные для обновления пароля
      * @return Возвращает объект {@link PasswordEntryResponseDto} с данными измененной записи.
      */
-    PasswordEntryResponseDto updateAllEntry(Long id, PasswordEntryUpdateDto dto);
+    PasswordEntryResponseDto updatePatchEntry(Long id, PasswordEntryUpdateDto dto);
 
     /**
      * Подсчет количества записей конкретного пользователя

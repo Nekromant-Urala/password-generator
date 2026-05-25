@@ -1,7 +1,7 @@
 package ru.matthew.NauJava.domain.crypto.generation;
 
 import org.springframework.stereotype.Service;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileForPasswordDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileForPasswordDto;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ public class RandomGeneratorServiceImpl implements RandomGeneratorService {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Override
-    public char[] generatePassword(GeneratorProfileForPasswordDto dto) {
+    public char[] generatePassword(ProfileForPasswordDto dto) {
         int passwordLength = dto.passwordLength();
 
         int requiredTypeChar = countRequiredTypeChar(dto);
@@ -77,7 +77,7 @@ public class RandomGeneratorServiceImpl implements RandomGeneratorService {
         return chars.charAt(SECURE_RANDOM.nextInt(chars.length()));
     }
 
-    private int countRequiredTypeChar(GeneratorProfileForPasswordDto dto) {
+    private int countRequiredTypeChar(ProfileForPasswordDto dto) {
         int count = 0;
         if (dto.isUppercase()) ++count;
         if (dto.isLowercase()) ++count;

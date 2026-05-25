@@ -3,16 +3,16 @@ package ru.matthew.NauJava.domain.profile.mapper;
 import org.springframework.stereotype.Component;
 import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpecConverter;
-import ru.matthew.NauJava.domain.profile.GeneratorProfile;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileForPasswordDto;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileRequestDto;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileResponseDto;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileUpdateDto;
+import ru.matthew.NauJava.domain.profile.Profile;
+import ru.matthew.NauJava.domain.profile.dto.ProfileForPasswordDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileRequestDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileResponseDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
 
 @Component
-public class GeneratorProfileMapper {
+public class ProfileMapper {
 
-    public GeneratorProfile toGeneratorProfile(GeneratorProfileRequestDto dto) {
+    public Profile toGeneratorProfile(ProfileRequestDto dto) {
         if (dto == null) {
             return null;
         }
@@ -20,7 +20,7 @@ public class GeneratorProfileMapper {
         var cipherAlgorithmSpec = CipherAlgorithmSpec.valueOf(dto.cipher());
         var kdfAlgorithmSpec = new KdfAlgorithmSpecConverter().convertToEntityAttribute(dto.kdfAlgorithm());
 
-        return new GeneratorProfile.GeneratorProfileBuilder()
+        return new Profile.GeneratorProfileBuilder()
                 .name(dto.name())
                 .passwordLength(dto.passwordLength())
                 .uppercase(dto.isUppercase())
@@ -36,7 +36,7 @@ public class GeneratorProfileMapper {
                 .build();
     }
 
-    public void updateGeneratorProfileDto(GeneratorProfile profile, GeneratorProfileUpdateDto dto) {
+    public void updateGeneratorProfileDto(Profile profile, ProfileUpdateDto dto) {
         if (dto == null || profile == null) {
             return;
         }
@@ -58,11 +58,11 @@ public class GeneratorProfileMapper {
         profile.setIterations(dto.iterations());
     }
 
-    public GeneratorProfileForPasswordDto toProfileForPasswordDto(GeneratorProfile profile) {
+    public ProfileForPasswordDto toProfileForPasswordDto(Profile profile) {
         if (profile == null) {
             return null;
         }
-        return new GeneratorProfileForPasswordDto(
+        return new ProfileForPasswordDto(
                 profile.getPasswordLength(),
                 profile.isUppercase(),
                 profile.isLowercase(),
@@ -73,11 +73,11 @@ public class GeneratorProfileMapper {
         );
     }
 
-    public GeneratorProfileResponseDto toGeneratorProfileResponseDto(GeneratorProfile profile) {
+    public ProfileResponseDto toGeneratorProfileResponseDto(Profile profile) {
         if (profile == null) {
             return null;
         }
-        return new GeneratorProfileResponseDto(
+        return new ProfileResponseDto(
                 profile.getId(),
                 profile.getName(),
                 profile.getPasswordLength(),

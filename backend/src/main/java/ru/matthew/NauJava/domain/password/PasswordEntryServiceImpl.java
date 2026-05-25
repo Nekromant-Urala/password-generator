@@ -18,9 +18,9 @@ import ru.matthew.NauJava.domain.password.dto.PasswordEntryUpdateDto;
 import ru.matthew.NauJava.domain.password.exception.PasswordEntryDecodeException;
 import ru.matthew.NauJava.domain.password.exception.PasswordEntryNotFoundException;
 import ru.matthew.NauJava.domain.password.mapper.PasswordEntryMapper;
-import ru.matthew.NauJava.domain.profile.GeneratorProfileRepository;
+import ru.matthew.NauJava.domain.profile.ProfileRepository;
 import ru.matthew.NauJava.domain.profile.exception.ProfileNotFoundException;
-import ru.matthew.NauJava.domain.profile.mapper.GeneratorProfileMapper;
+import ru.matthew.NauJava.domain.profile.mapper.ProfileMapper;
 import ru.matthew.NauJava.domain.user.UserRepository;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
@@ -37,12 +37,12 @@ import static ru.matthew.NauJava.domain.audit.EventType.*;
 public class PasswordEntryServiceImpl implements PasswordEntryService {
 
     private final UserRepository userRepository;
-    private final GeneratorProfileRepository profileRepository;
+    private final ProfileRepository profileRepository;
 
     private final EncryptionService encryptionService;
     private final RandomGeneratorService generatorService;
 
-    private final GeneratorProfileMapper profileMapper;
+    private final ProfileMapper profileMapper;
     private final PasswordEntryMapper passwordEntryMapper;
     private final PasswordEntryRepository passwordEntryRepository;
 
@@ -55,7 +55,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
             UserRepository userRepository,
             PasswordEntryRepository passwordEntryRepository,
             EncryptionService encryptionService,
-            GeneratorProfileRepository profileRepository, RandomGeneratorService generatorService, GeneratorProfileMapper profileMapper,
+            ProfileRepository profileRepository, RandomGeneratorService generatorService, ProfileMapper profileMapper,
             ApplicationEventPublisher eventPublisher
     ) {
         this.passwordEntryMapper = passwordEntryMapper;
@@ -201,7 +201,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     }
 
     @Override
-    public PasswordEntryResponseDto updateAllEntry(Long id, PasswordEntryUpdateDto dto) {
+    public PasswordEntryResponseDto updatePatchEntry(Long id, PasswordEntryUpdateDto dto) {
         var oldEntry = passwordEntryRepository.findById(id).orElseThrow(
                 () -> new PasswordEntryNotFoundException(id)
         );

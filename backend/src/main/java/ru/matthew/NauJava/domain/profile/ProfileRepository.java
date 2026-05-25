@@ -10,16 +10,16 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 
-public interface GeneratorProfileRepository extends JpaRepository<GeneratorProfile, Long> {
+public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     /**
      * Поиск профилей по их названию.
      *
      * @param userId уникальный идентификатор пользователя.
      * @param name название профиля.
-     * @return Список профилей {@link GeneratorProfile} с совпадающим названием.
+     * @return Список профилей {@link Profile} с совпадающим названием.
      */
-    Optional<GeneratorProfile> findByUserIdAndName(Long userId, String name);
+    Optional<Profile> findByUserIdAndName(Long userId, String name);
 
     /**
      * Поиск профилей, созданных в заданном временном диапазоне.
@@ -27,26 +27,26 @@ public interface GeneratorProfileRepository extends JpaRepository<GeneratorProfi
      * @param userId уникальный идентификатор пользователя.
      * @param createAtAfter  начальная дата диапазона.
      * @param createAtBefore конечная дата диапазона.
-     * @return Список профилей {@link GeneratorProfile}.
+     * @return Список профилей {@link Profile}.
      */
-    Page<GeneratorProfile> findAllByUserIdAndCreateAtBetween(Long userId, LocalDateTime createAtAfter, LocalDateTime createAtBefore, Pageable pageable);
+    Page<Profile> findAllByUserIdAndCreateAtBetween(Long userId, LocalDateTime createAtAfter, LocalDateTime createAtBefore, Pageable pageable);
 
     /**
      * Поиск профилей по точной дате создания.
      *
      * @param userId уникальный идентификатор пользователя.
      * @param createAt дата создания.
-     * @return Список профилей {@link GeneratorProfile}.
+     * @return Список профилей {@link Profile}.
      */
-    Page<GeneratorProfile> findAllByUserIdAndCreateAt(Long userId, LocalDateTime createAt, Pageable pageable);
+    Page<Profile> findAllByUserIdAndCreateAt(Long userId, LocalDateTime createAt, Pageable pageable);
 
     /**
      * Поиск всех профилей, принадлежащих указанному пользователю.
      *
      * @param userId уникальный идентификатор пользователя.
-     * @return Список профилей {@link GeneratorProfile} пользователя.
+     * @return Список профилей {@link Profile} пользователя.
      */
-    Page<GeneratorProfile> findAllByUserId(Long userId, Pageable pageable);
+    Page<Profile> findAllByUserId(Long userId, Pageable pageable);
 
     /**
      * Подсчитывает количество всех профайлов генерации конкретного пользователя

@@ -5,7 +5,7 @@ import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpec;
 
 import java.time.LocalDateTime;
 
-public record GeneratorProfileResponseDto(
+public record ProfileResponseDto(
         Long id,
         String name,
         Integer passwordLength,

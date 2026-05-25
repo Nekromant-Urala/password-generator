@@ -5,6 +5,7 @@ import ru.matthew.NauJava.domain.audit.Audit;
 import ru.matthew.NauJava.domain.audit.dto.AuditCreateDto;
 import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
 import ru.matthew.NauJava.domain.audit.dto.AuditResponseDto;
+import ru.matthew.NauJava.domain.audit.dto.AuditStatsResponseDto;
 
 @Component
 public class AuditMapper {
@@ -19,6 +20,20 @@ public class AuditMapper {
         event.setUserAgent(dto.userAgent());
         event.setDescription(dto.description());
         return event;
+    }
+
+    public AuditStatsResponseDto toAuditStatsResponseDto(
+            long totalEvent,
+            long totalUser,
+            long totalEntries,
+            long totalUsersForLastDay
+    ) {
+        return new AuditStatsResponseDto(
+                totalEvent,
+                totalUser,
+                totalEntries,
+                totalUsersForLastDay
+        );
     }
 
     public AuditResponseDto toAuditResponseDto(Audit audit) {

@@ -1,18 +1,18 @@
 package ru.matthew.NauJava.domain.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
-import ru.matthew.NauJava.domain.user.dto.UserUpdateEmailDto;
-import ru.matthew.NauJava.domain.user.dto.UserUpdatePasswordDto;
-import ru.matthew.NauJava.domain.user.dto.UserUpdateUsernameDto;
+import ru.matthew.NauJava.domain.user.dto.*;
 
 import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserRestController {
 
     private final UserService userService;
@@ -22,55 +22,64 @@ public class UserRestController {
         this.userService = userService;
     }
 
+    @PostMapping
+    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserCreateDto userCreateDto) {
+        var user = userService.createUser(userCreateDto);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
-        var user = userService.findById(id);
-        return ResponseEntity.ok(user);
-    }
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable(name = "id") Long userId) {
+        var user = userService.findById(userId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
 
-    @GetMapping("/search/email")
-    public ResponseEntity<UserResponseDto> getUserByEmail(@RequestParam String email) {
-        var user = userService.findByEmail(email);
-        return ResponseEntity.ok(user);
-    }
-
-    @GetMapping("/search/username")
-    public ResponseEntity<UserResponseDto> getUserByUsername(@RequestParam String username) {
-        var user = userService.findByUsername(username);
-        return ResponseEntity.ok(user);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> getAllUser() {
+    public ResponseEntity<List<UserResponseDto>> getUsers(
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String username
+    ) {
+        if (email != null) {
+            var user = userService.findByEmail(email);
+            return new ResponseEntity<>(List.of(user), HttpStatus.OK);
+        }
+        if (username != null) {
+            var user = userService.findByUsername(username);
+            return new ResponseEntity<>(List.of(user), HttpStatus.OK);
+        }
         var users = userService.findAll();
-        return ResponseEntity.ok(users);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/username")
-    public ResponseEntity<UserResponseDto> updateUsername(@PathVariable Long id, @RequestBody UserUpdateUsernameDto req) {
-        var dto = userService.updateUsername(id, req.username());
-        return ResponseEntity.ok(dto);
+    @PatchMapping("/me/details")
+    public ResponseEntity<UserResponseDto> patchUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserPatchDto dto
+    ) {
+        var user = userService.patchUser(userDetails.id(), dto);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/email")
-    public ResponseEntity<UserResponseDto> updateEmail(@PathVariable Long id, @RequestBody UserUpdateEmailDto req) {
-        var dto = userService.updateEmail(id, req.email());
-        return ResponseEntity.ok(dto);
-    }
-
-    @PutMapping("/{id}/password")
-    public ResponseEntity<UserResponseDto> updatePassword(@PathVariable Long id, @RequestBody UserUpdatePasswordDto req) {
+    @PutMapping("/me/password")
+    public ResponseEntity<UserResponseDto> updatePassword(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserUpdatePasswordDto passwordDto
+    ) {
         try {
-            var dto = userService.updatePassword(id, req.password());
-            return ResponseEntity.ok(dto);
+            var user = userService.updatePassword(userDetails.id(), passwordDto);
+            return new ResponseEntity<>(user, HttpStatus.OK);
         } finally {
-            Arrays.fill(req.password(), '\0');
+            Arrays.fill(passwordDto.newPassword(), '\0');
+            Arrays.fill(passwordDto.oldPassword(), '\0');
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        userService.deleteById(userDetails.id());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

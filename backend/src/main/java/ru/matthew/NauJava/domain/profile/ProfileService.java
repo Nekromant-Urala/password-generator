@@ -2,9 +2,13 @@ package ru.matthew.NauJava.domain.profile;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileRequestDto;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileResponseDto;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileUpdateDto;
+
+import ru.matthew.NauJava.domain.profile.dto.ProfileRequestDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileResponseDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
+import ru.matthew.NauJava.domain.profile.exception.ProfileNotFoundException;
+
+import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,75 +17,79 @@ import java.util.List;
  * Интерфейс сервиса для работы с профилями генерации.
  * Управляет настройками, алгоритмами формирования ключей (KDF) и шифрования.
  */
-public interface GeneratorProfileService {
+public interface ProfileService {
 
     /**
      * Создает новый профиль генерации
      *
      * @param userId уникальный идентификатор пользователя.
-     * @param dto данные для создания профиля
-     * @return Созданный профиль {@link GeneratorProfileResponseDto}
+     * @param dto    данные для создания профиля
+     * @return Созданный профиль {@link ProfileResponseDto}
+     * @throws {@link UserNotFoundException} в случае если пользователь не был найден
      */
-    GeneratorProfileResponseDto createProfile(Long userId, GeneratorProfileRequestDto dto);
+    ProfileResponseDto createProfile(Long userId, ProfileRequestDto dto);
 
     /**
      * Создает новый профиль по умолчанию
      *
      * @param userId уникальный идентификатор пользователя.
-     * @return Созданный профиль {@link GeneratorProfileResponseDto}
+     * @return Созданный профиль {@link ProfileResponseDto}
+     * @throws {@link UserNotFoundException} в случае если пользователь не был найден
      */
-    GeneratorProfileResponseDto createDefaultProfile(Long userId);
+    ProfileResponseDto createDefaultProfile(Long userId);
 
     /**
      * Поиск профиля по уникальному идентификатору
      *
      * @param id уникальный идентификатор
-     * @return Найденный профиль {@link GeneratorProfileResponseDto}
+     * @return Найденный профиль {@link ProfileResponseDto}
+     * @throws {@link ProfileNotFoundException} в случае если профайл не был найден
      */
-    GeneratorProfileResponseDto findById(Long id);
+    ProfileResponseDto findById(Long id);
 
     /**
      * Поиск профиля по его названию
      *
      * @param userId уникальный идентификатор пользователя.
-     * @param name название профиля
-     * @return Профиль {@link GeneratorProfileResponseDto} с совпадающим названием
+     * @param name   название профиля
+     * @return Профиль {@link ProfileResponseDto} с совпадающим названием
+     * @throws {@link ProfileNotFoundException} в случае если профайл не был найден
      */
-    GeneratorProfileResponseDto findByName(Long userId, String name);
+    ProfileResponseDto findByName(Long userId, String name);
 
     /**
      * Поиск профилей, созданных в заданном временном диапазоне
      *
-     * @param userId уникальный идентификатор пользователя
+     * @param userId    уникальный идентификатор пользователя
      * @param startDate начальная дата диапазона
      * @param endDate   конечная дата диапазона
-     * @return Список профилей {@link GeneratorProfileResponseDto}
+     * @return Список профилей {@link ProfileResponseDto}
      */
-    Page<GeneratorProfileResponseDto> findAllByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    Page<ProfileResponseDto> findAllByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
     /**
      * Поиск профилей по точной дате создания.
      *
-     * @param userId уникальный идентификатор пользователя
+     * @param userId   уникальный идентификатор пользователя
      * @param createAt дата создания профиля генерации
-     * @return Список профилей {@link GeneratorProfileResponseDto}
+     * @return Список профилей {@link ProfileResponseDto}
      */
-    Page<GeneratorProfileResponseDto> findAllByCreateAt(Long userId, LocalDateTime createAt, Pageable pageable);
+    Page<ProfileResponseDto> findAllByCreateAt(Long userId, LocalDateTime createAt, Pageable pageable);
 
     /**
      * Поиск всех профилей, принадлежащих указанному пользователю
      *
      * @param userId уникальный идентификатор пользователя
-     * @return Список профилей {@link GeneratorProfileResponseDto} пользователя
+     * @return Список профилей {@link ProfileResponseDto} пользователя
      */
-    Page<GeneratorProfileResponseDto> findAllByUserId(Long userId, Pageable pageable);
+    Page<ProfileResponseDto> findAllByUserId(Long userId, Pageable pageable);
 
     /**
      * Возвращает список всех существующих профилей генерации
      *
-     * @return Список всех профилей {@link GeneratorProfileResponseDto}
+     * @return Список всех профилей {@link ProfileResponseDto}
      */
-    List<GeneratorProfileResponseDto> findAll();
+    List<ProfileResponseDto> findAll();
 
     /**
      * Подсчитывает количество всех профайлов генерации конкретного пользователя
@@ -94,11 +102,11 @@ public interface GeneratorProfileService {
     /**
      * Обновляет базовые настройки профиля генерации
      *
-     * @param id уникальный идентификатор профайла
-     * @param dto новые настройки {@link GeneratorProfileUpdateDto}
-     * @return Обновленный профиль {@link GeneratorProfileResponseDto}
+     * @param id  уникальный идентификатор профайла
+     * @param dto новые настройки {@link ProfileUpdateDto}
+     * @return Обновленный профиль {@link ProfileResponseDto}
      */
-    GeneratorProfileResponseDto updateSettings(Long id, GeneratorProfileUpdateDto dto);
+    ProfileResponseDto updateSettings(Long id, ProfileUpdateDto dto);
 
     /**
      * Удаляет все профили, принадлежащие указанному пользователю
@@ -110,7 +118,7 @@ public interface GeneratorProfileService {
     /**
      * Удаляет профили по точной дате создания
      *
-     * @param userId уникальный идентификатор пользователя
+     * @param userId   уникальный идентификатор пользователя
      * @param createAt дата создания
      */
     void deleteAllByCreatedAt(Long userId, LocalDateTime createAt);
@@ -118,7 +126,7 @@ public interface GeneratorProfileService {
     /**
      * Удаляет профили, созданные в заданном временном диапазоне
      *
-     * @param userId уникальный идентификатор пользователя
+     * @param userId    уникальный идентификатор пользователя
      * @param startDate начальная дата диапазона
      * @param endDate   конечная дата диапазона
      */
@@ -128,7 +136,7 @@ public interface GeneratorProfileService {
      * Удаляет профили по их названию.
      *
      * @param userId уникальный идентификатор пользователя
-     * @param name название удаляемых профилей.
+     * @param name   название удаляемых профилей.
      */
     void deleteByName(Long userId, String name);
 
@@ -136,7 +144,7 @@ public interface GeneratorProfileService {
      * Удаляет профиль по уникальному идентификатору.
      *
      * @param userId уникальный идентификатор пользователя
-     * @param id уникальный идентификатор профиля.
+     * @param id     уникальный идентификатор профиля.
      */
     void deleteById(Long userId, Long id);
 }

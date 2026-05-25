@@ -1,6 +1,7 @@
 package ru.matthew.NauJava.domain.user.dto;
 
-public record UserUpdateEmailDto(
+public record UserUpdateFullDto(
+        String username,
         String email
 ) {
 }

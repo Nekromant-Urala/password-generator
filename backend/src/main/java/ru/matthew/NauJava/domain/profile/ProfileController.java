@@ -9,21 +9,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileRequestDto;
-import ru.matthew.NauJava.domain.profile.dto.GeneratorProfileUpdateDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileRequestDto;
+import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
 import ru.matthew.NauJava.domain.user.UserService;
 
 @Controller
 @RequestMapping("/profiles")
-public class GeneratorProfileController {
+public class ProfileController {
 
     private final UserService userService;
-    private final GeneratorProfileService profileService;
+    private final ProfileService profileService;
 
     private static final int PAGE_SIZE = 10;
 
     @Autowired
-    public GeneratorProfileController(UserService userService, GeneratorProfileService profileService) {
+    public ProfileController(UserService userService, ProfileService profileService) {
         this.userService = userService;
         this.profileService = profileService;
     }
@@ -58,7 +58,7 @@ public class GeneratorProfileController {
     @PostMapping("/create")
     public String createProfile(
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute("profileCreateDto") GeneratorProfileRequestDto dto,
+            @ModelAttribute("profileCreateDto") ProfileRequestDto dto,
             RedirectAttributes redirectAttributes
     ) {
         var userDto = userService.findByUsername(userDetails.getUsername());
@@ -76,7 +76,7 @@ public class GeneratorProfileController {
     public String updateProfile(
             @PathVariable(name = "id") Long profileId,
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute("profileUpdateDto") GeneratorProfileUpdateDto dto,
+            @ModelAttribute("profileUpdateDto") ProfileUpdateDto dto,
             @RequestParam(name = "page", defaultValue = "0") int page,
             RedirectAttributes redirectAttributes
     ) {

@@ -1,9 +1,9 @@
 package ru.matthew.NauJava.domain.user;
 
-import ru.matthew.NauJava.domain.user.dto.UserCreateDto;
-import ru.matthew.NauJava.domain.user.dto.UserResponseDto;
+import ru.matthew.NauJava.domain.user.dto.*;
 import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
+import ru.matthew.NauJava.domain.user.exception.UserPasswordMissMatchException;
 
 import java.util.List;
 
@@ -58,34 +58,25 @@ public interface UserService {
     List<UserResponseDto> findAll();
 
     /**
-     * Изменяет адрес электронной пользователя (email).
+     * Частичное обновление данных пользователя.
+     * Доступно обновления электронной почты (email) или имени пользователя (username)
      *
-     * @param id    уникальный идентификатор пользователя.
-     * @param email новый адрес электронной почты.
+     * @param id  уникальный идентификатор пользователя
+     * @param dto данные для обновления
      * @return Возвращает объект {@link UserResponseDto} с данными измененного пользователя.
      * @throws {@link UserNotFoundException} если пользователь с заданным id не существует.
      */
-    UserResponseDto updateEmail(Long id, String email);
-
-    /**
-     * Изменяет имя пользователя (username).
-     *
-     * @param id       уникальный идентификатор пользователя.
-     * @param username новое имя пользователя
-     * @return Возвращает объект {@link UserResponseDto} с данными измененного пользователя.
-     * @throws @throws {@link UserNotFoundException} если пользователь с заданным id не существует.
-     */
-    UserResponseDto updateUsername(Long id, String username);
+    UserResponseDto patchUser(Long id, UserPatchDto dto);
 
     /**
      * Устанавливает новый пароль для пользователя.
      *
-     * @param id       уникальный идентификатор пользователя.
-     * @param password новый пароль
+     * @param id  уникальный идентификатор пользователя.
+     * @param dto данные для обновления
      * @return Возвращает объект {@link UserResponseDto} с данными измененного пользователя.
-     * @throws @throws {@link UserNotFoundException} если пользователь с заданным id не существует.
+     * @throws {@link UserNotFoundException} если пользователь с заданным id не существует. {@link UserPasswordMissMatchException} если старый пароль не совпал с паролем хранящимся в базе данных
      */
-    UserResponseDto updatePassword(Long id, char[] password);
+    UserResponseDto updatePassword(Long id, UserUpdatePasswordDto dto);
 
     /**
      * Удаляет пользователя и все связанные с ним данные из системы.

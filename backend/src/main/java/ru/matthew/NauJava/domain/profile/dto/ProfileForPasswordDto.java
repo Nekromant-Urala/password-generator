@@ -1,6 +1,6 @@
 package ru.matthew.NauJava.domain.profile.dto;
 
-public record GeneratorProfileForPasswordDto(
+public record ProfileForPasswordDto(
         Integer passwordLength,
         boolean isUppercase,
         boolean isLowercase,
