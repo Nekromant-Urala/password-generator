@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,7 +64,6 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      * @param userId DTO с данными пользователя, для которого выполняется поиск
      * @return Возвращает список объектов {@link PasswordEntry} с данными найденного пользователя.
      */
-    @RestResource(exported = false)
     @Query("SELECT p FROM PasswordEntry p WHERE p.user.id = :userId")
     List<PasswordEntry> findByUserId(@Param("userId") Long userId);
 

@@ -1,5 +1,7 @@
 package ru.matthew.NauJava.domain.profile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -34,6 +36,8 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileServiceImpl.class);
+
     @Autowired
     public ProfileServiceImpl(
             UserRepository userRepository,
@@ -52,15 +56,16 @@ public class ProfileServiceImpl implements ProfileService {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(userId)
         );
-        var profile = profileMapper.toGeneratorProfile(dto);
+        var profile = profileMapper.toProfile(dto);
 
         profile.setUser(user);
         user.addProfile(profile);
         profileRepository.save(profile);
 
         eventPublisher.publishEvent(new AuditEventDto(userId, CREATE_PROFILE, "создание профиля-генерации"));
+        LOGGER.info("Создание профайла-генерация пользователем с id:{}", userId);
 
-        return profileMapper.toGeneratorProfileResponseDto(profile);
+        return profileMapper.toProfileResponseDto(profile);
     }
 
     @Override
@@ -68,7 +73,7 @@ public class ProfileServiceImpl implements ProfileService {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(userId)
         );
-        var defaultProfile = new Profile.GeneratorProfileBuilder()
+        var defaultProfile = new Profile.ProfileBuilder()
                 .name("default")
                 .passwordLength(12)
                 .uppercase(true)
@@ -85,16 +90,17 @@ public class ProfileServiceImpl implements ProfileService {
 
         defaultProfile.setUser(user);
         user.addProfile(defaultProfile);
+        LOGGER.info("Создание профайла по умолчанию для пользователя с id:{}", userId);
 
         profileRepository.save(defaultProfile);
-        return profileMapper.toGeneratorProfileResponseDto(defaultProfile);
+        return profileMapper.toProfileResponseDto(defaultProfile);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProfileResponseDto findById(Long id) {
         return profileRepository.findById(id)
-                .map(profileMapper::toGeneratorProfileResponseDto)
+                .map(profileMapper::toProfileResponseDto)
                 .orElseThrow(
                         () -> new ProfileNotFoundException("Профайл генерации не был найден по id:%d".formatted(id))
                 );
@@ -104,7 +110,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional(readOnly = true)
     public ProfileResponseDto findByName(Long userId, String name) {
         return profileRepository.findByUserIdAndName(userId, name)
-                .map(profileMapper::toGeneratorProfileResponseDto)
+                .map(profileMapper::toProfileResponseDto)
                 .orElseThrow(
                         () -> new ProfileNotFoundException("Профайл генерации c именем:%s не был найден".formatted(name))
                 );
@@ -114,28 +120,28 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional(readOnly = true)
     public Page<ProfileResponseDto> findAllByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         return profileRepository.findAllByUserIdAndCreateAtBetween(userId, startDate, endDate, pageable)
-                .map(profileMapper::toGeneratorProfileResponseDto);
+                .map(profileMapper::toProfileResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ProfileResponseDto> findAllByCreateAt(Long userId, LocalDateTime createAt, Pageable pageable) {
         return profileRepository.findAllByUserIdAndCreateAt(userId, createAt, pageable)
-                .map(profileMapper::toGeneratorProfileResponseDto);
+                .map(profileMapper::toProfileResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ProfileResponseDto> findAllByUserId(Long userId, Pageable pageable) {
         return profileRepository.findAllByUserId(userId, pageable)
-                .map(profileMapper::toGeneratorProfileResponseDto);
+                .map(profileMapper::toProfileResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProfileResponseDto> findAll() {
         return profileRepository.findAll().stream()
-                .map(profileMapper::toGeneratorProfileResponseDto)
+                .map(profileMapper::toProfileResponseDto)
                 .toList();
     }
 
@@ -145,45 +151,50 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    //TODO добавить логику перешифрования данных, если изменились критичные параметры
     public ProfileResponseDto updateSettings(Long id, ProfileUpdateDto dto) {
         var profile = profileRepository.findById(id).orElseThrow(
                 () -> new ProfileNotFoundException(id)
         );
-        profileMapper.updateGeneratorProfileDto(profile, dto);
+        profileMapper.updateProfileDto(profile, dto);
 
         eventPublisher.publishEvent(new AuditEventDto(profile.getUser().getId(), UPDATE_PROFILE, "обновление настроек профиля-генерации"));
+        LOGGER.info("Успешное обновление данных профайла генерации пользователем с id:{} profile:{}", profile.getUser().getId(), profile.getId());
 
-        return profileMapper.toGeneratorProfileResponseDto(profile);
+        return profileMapper.toProfileResponseDto(profile);
     }
 
     @Override
     public void deleteAllByUserId(Long userId) {
         profileRepository.deleteAllByUserId(userId);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_PROFILE, "удаление всех профилей-генерации пользователя"));
+        LOGGER.info("Удаление всех профилей-генерации пользователя c id:{}", userId);
     }
 
     @Override
     public void deleteAllByCreatedAt(Long userId, LocalDateTime createAt) {
         profileRepository.deleteAllByUserIdAndCreateAt(userId, createAt);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_PROFILE, "удаление всех профилей-генерации пользователя по дате создания"));
+        LOGGER.info("Удаление всех профилей-генерации пользователя c id:{} по заданному времени: {}", userId, createAt);
     }
 
     @Override
     public void deleteAllByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate) {
         profileRepository.deleteAllByUserIdAndCreateAtBetween(userId, startDate, endDate);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_PROFILE, "удаление всех профилей-генерации пользователя по заданному периоду времени"));
+        LOGGER.info("Удаление всех профилей-генерации пользователя c id:{} по заданному диапазону времени: с {} по {}", userId, startDate, endDate);
     }
 
     @Override
     public void deleteByName(Long userId, String name) {
         profileRepository.deleteByUserIdAndName(userId, name);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_PROFILE, "удаление профиля-генерации по заданному имени"));
+        LOGGER.info("Удаление профиля-генерации пользователя c id:{} по заданному имени профиля", userId);
     }
 
     @Override
     public void deleteById(Long userId, Long id) {
         profileRepository.deleteById(id);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_PROFILE, "удаление профиля-генерации по id"));
+        LOGGER.info("Удаление профиля-генерации пользователя c id:{} по заданному id события: {}", userId, id);
     }
 }

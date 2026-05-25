@@ -44,7 +44,6 @@ public class AuditController {
 
         var events = auditService.findAll(pageable);
 
-        //TODO поправить отображение так как выезжает за рамки окна
         model.addAttribute("events", events.getContent());
         model.addAttribute("eventPage", events);
         model.addAttribute("currentPage", events.getNumber());

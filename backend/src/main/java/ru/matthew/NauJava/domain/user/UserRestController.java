@@ -52,7 +52,7 @@ public class UserRestController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PatchMapping("/me/details")
+    @PatchMapping("/details")
     public ResponseEntity<UserResponseDto> patchUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody UserPatchDto dto
@@ -61,7 +61,7 @@ public class UserRestController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping("/me/password")
+    @PutMapping("/password")
     public ResponseEntity<UserResponseDto> updatePassword(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody UserUpdatePasswordDto passwordDto

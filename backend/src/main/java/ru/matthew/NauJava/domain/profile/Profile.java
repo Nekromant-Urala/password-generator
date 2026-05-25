@@ -9,7 +9,6 @@ import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
 
-//TODO при удалении сущности, записи зашифрованные с помощью него будут не доступны (если изменяться параметры итерации или алгоритмов)
 @Entity
 @Table(name = "generator_profile")
 public class Profile {
@@ -68,7 +67,7 @@ public class Profile {
     protected Profile() {
     }
 
-    public Profile(GeneratorProfileBuilder builder) {
+    public Profile(ProfileBuilder builder) {
         this.name = builder.name;
         this.passwordLength = builder.passwordLength;
         this.isUppercase = builder.isUppercase;
@@ -83,7 +82,7 @@ public class Profile {
         this.iterations = builder.iterations;
     }
 
-    public static class GeneratorProfileBuilder {
+    public static class ProfileBuilder {
         private String name;
         private Integer passwordLength;
         private boolean isUppercase;
@@ -97,62 +96,62 @@ public class Profile {
         private CipherAlgorithmSpec cipher;
         private Integer iterations;
 
-        public GeneratorProfileBuilder name(String name) {
+        public ProfileBuilder name(String name) {
             this.name = name;
             return this;
         }
 
-        public GeneratorProfileBuilder passwordLength(Integer passwordLength) {
+        public ProfileBuilder passwordLength(Integer passwordLength) {
             this.passwordLength = passwordLength;
             return this;
         }
 
-        public GeneratorProfileBuilder uppercase(boolean uppercase) {
+        public ProfileBuilder uppercase(boolean uppercase) {
             isUppercase = uppercase;
             return this;
         }
 
-        public GeneratorProfileBuilder lowercase(boolean lowercase) {
+        public ProfileBuilder lowercase(boolean lowercase) {
             isLowercase = lowercase;
             return this;
         }
 
-        public GeneratorProfileBuilder digits(boolean digits) {
+        public ProfileBuilder digits(boolean digits) {
             isDigits = digits;
             return this;
         }
 
-        public GeneratorProfileBuilder specialChars(boolean specialChars) {
+        public ProfileBuilder specialChars(boolean specialChars) {
             isSpecialChars = specialChars;
             return this;
         }
 
-        public GeneratorProfileBuilder avoidAmbiguousChars(boolean avoidAmbiguousChars) {
+        public ProfileBuilder avoidAmbiguousChars(boolean avoidAmbiguousChars) {
             isAvoidAmbiguousChars = avoidAmbiguousChars;
             return this;
         }
 
-        public GeneratorProfileBuilder favorite(boolean favorite) {
+        public ProfileBuilder favorite(boolean favorite) {
             isFavorite = favorite;
             return this;
         }
 
-        public GeneratorProfileBuilder customChars(String customChars) {
+        public ProfileBuilder customChars(String customChars) {
             this.customChars = customChars;
             return this;
         }
 
-        public GeneratorProfileBuilder kdfAlgorithm(KdfAlgorithmSpec kdfAlgorithm) {
+        public ProfileBuilder kdfAlgorithm(KdfAlgorithmSpec kdfAlgorithm) {
             this.kdfAlgorithm = kdfAlgorithm;
             return this;
         }
 
-        public GeneratorProfileBuilder cipher(CipherAlgorithmSpec cipher) {
+        public ProfileBuilder cipher(CipherAlgorithmSpec cipher) {
             this.cipher = cipher;
             return this;
         }
 
-        public GeneratorProfileBuilder iterations(Integer iterations) {
+        public ProfileBuilder iterations(Integer iterations) {
             this.iterations = iterations;
             return this;
         }

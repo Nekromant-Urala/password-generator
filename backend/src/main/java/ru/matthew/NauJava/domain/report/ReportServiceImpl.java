@@ -25,7 +25,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public ReportDto createReport() {
-        //TODO добавить генерацию отчета
         return null;
     }
 

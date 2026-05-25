@@ -34,16 +34,16 @@ public class AuditRestController {
             @Valid AuditSearchFilterDto filter,
             Pageable pageable
     ) {
+        if (filter.userAgent() != null && filter.userId() != null) {
+            var events = auditService.findByUserAgent(filter.userId(), filter.userAgent(), pageable);
+            return new ResponseEntity<>(events, HttpStatus.OK);
+        }
         if (filter.userId() != null) {
             var events = auditService.findByUserId(filter.userId(), pageable);
             return new ResponseEntity<>(events, HttpStatus.OK);
         }
         if (filter.eventType() != null) {
             var events = auditService.findByEventType(filter.eventType(), pageable);
-            return new ResponseEntity<>(events, HttpStatus.OK);
-        }
-        if (filter.userAgent() != null) {
-            var events = auditService.findByUserAgent(filter.userAgent(), pageable);
             return new ResponseEntity<>(events, HttpStatus.OK);
         }
         if (filter.createdAt() != null) {

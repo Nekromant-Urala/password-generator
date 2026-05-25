@@ -54,7 +54,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
      * @param userId уникальный идентификатор пользователя
      * @return количество всех профайлов генерации конкретного пользователя
      */
-    @Query("SELECT count(p) FROM GeneratorProfile p WHERE p.user.id = :userId")
+    @Query("SELECT count(p) FROM Profile p WHERE p.user.id = :userId")
     long countAllByUserId(@Param("userId") Long userId);
 
     /**
