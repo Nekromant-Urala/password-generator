@@ -1,5 +1,7 @@
 package ru.matthew.NauJava.domain.password;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -48,6 +50,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PasswordEntryServiceImpl.class);
 
     @Autowired
     public PasswordEntryServiceImpl(
@@ -76,7 +79,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
         );
 
         var profile = profileRepository.findByUserIdAndName(userId, dto.profileName())
-                .orElse(profileRepository.findByUserIdAndName(userId, "default")
+                .orElse(profileRepository.findByUserIdAndName(userId, "default") // нужно добавить смену с дефолтного на выбранный (при создании дефолтный всегда выбранный)
                         .orElseThrow(
                                 () -> new ProfileNotFoundException("Не удалось подобрать необходимый профайл для создания пароля")
                         ));
@@ -101,13 +104,14 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
                     )
             ));
 
-            passwordEntryRepository.save(entry);
+            entry = passwordEntryRepository.save(entry);
 
             eventPublisher.publishEvent(new AuditEventDto(userId, CREATE_ENTRY, "Создание записи данных"));
+            LOGGER.info("Создание записи данных о пароле c id {} пользователем с id: {}", entry.getId(), userId);
 
             return passwordEntryMapper.toPasswordEntryResponseDto(entry);
         } catch (CharacterCodingException e) {
-            throw new PasswordEntryDecodeException("Ошибка при записи пароля.", e);
+            throw new PasswordEntryDecodeException(e);
         } finally {
             Arrays.fill(password, '\0');
         }
@@ -187,14 +191,16 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
         );
         try {
             var profile = entry.getProfile();
-
-            return new PasswordResponseDto(bytesToChars(encryptionService.decrypt(
-                    charsToBytes(entry.getPassword().toCharArray()),
-                    entry.getUser().getPassword().toCharArray(),
-                    profile.getCipher(),
-                    profile.getKdfAlgorithm(),
-                    profile.getIterations()
-            )));
+            LOGGER.info("Запрос пользователя с id:{} на получение пароля из записи с id: {}", entry.getUser().getId(), entry.getId());
+            return new PasswordResponseDto(bytesToChars(
+                    encryptionService.decrypt(
+                            charsToBytes(entry.getPassword().toCharArray()),
+                            entry.getUser().getPassword().toCharArray(),
+                            profile.getCipher(),
+                            profile.getKdfAlgorithm(),
+                            profile.getIterations()
+                    )
+            ));
         } catch (EncryptionException e) {
             throw new PasswordEntryDecodeException(e);
         }
@@ -210,7 +216,6 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
         var profile = newEntry.getProfile();
 
         try {
-            // подумать над валидацией пустого поля пароля (пользователь оставил старый пароль)
             if (dto.password() != null && dto.password().length > 0) {
                 newEntry.setPassword(bytesToString(
                         encryptionService.encrypt(
@@ -225,10 +230,11 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
             }
 
             eventPublisher.publishEvent(new AuditEventDto(newEntry.getUser().getId(), UPDATE_ENTRY, "обновление данных записи"));
+            LOGGER.info("Успешное обновление данных записи c id: {} пользователем с id:{}", newEntry.getId(), newEntry.getUser().getId());
 
             return passwordEntryMapper.toPasswordEntryResponseDto(newEntry);
         } catch (CharacterCodingException e) {
-            throw new PasswordEntryDecodeException("Ошибка при записи пароля.", e);
+            throw new PasswordEntryDecodeException(e);
         }
     }
 
@@ -236,23 +242,27 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     public void deleteByUserId(Long userId) {
         passwordEntryRepository.deleteByUserId(userId);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_ENTRY, "удаление всех записей пользователя"));
+        LOGGER.info("Удаление всех записей пользователя с id:{}", userId);
     }
 
     @Override
     public void deleteByServiceName(Long userId, String serviceName) {
         passwordEntryRepository.deleteAllByUserIdAndServiceName(userId, serviceName);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_ENTRY, "удаление всех записей по указанному сервису"));
+        LOGGER.info("Удаление всех записей пользователя с id: {} с заданным наименованием сервиса", userId);
     }
 
     @Override
     public void deleteByCreatedAtBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate) {
         passwordEntryRepository.deleteAllByUserIdAndCreatedAtBetween(userId, startDate, endDate);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_ENTRY, "удаление всех записей в заданных временных рамках"));
+        LOGGER.info("Удаление всех записей пользователя с id: {} во временном промежутке: с {} до {}", userId, startDate, endDate);
     }
 
     @Override
     public void deleteById(Long userId, Long id) {
         passwordEntryRepository.deleteById(id);
         eventPublisher.publishEvent(new AuditEventDto(userId, DELETE_ENTRY, "удаление конкретной записи"));
+        LOGGER.info("Удаление записи с id:{} пользователем с id:{}", id, userId);
     }
 }

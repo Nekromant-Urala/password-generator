@@ -1,5 +1,7 @@
 package ru.matthew.NauJava.domain.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,6 +38,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
     @Autowired
     public UserServiceImpl(
             UserMapper userMapper,
@@ -67,6 +71,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         profileService.createDefaultProfile(savedUser.getId());
 
         eventPublisher.publishEvent(new AuditEventDto(savedUser.getId(), SIGN_UP_USER, "регистрация пользователя"));
+        LOGGER.info("Регистрация нового пользователя с id {}", savedUser.getId());
 
         return userMapper.toResponseDto(savedUser);
     }
@@ -74,25 +79,29 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserResponseDto findById(Long id) {
-        return userRepository.findById(id).map(userMapper::toResponseDto).orElseThrow(
-                () -> new UserNotFoundException(id)
-        );
+        return userRepository.findById(id)
+                .map(userMapper::toResponseDto)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserResponseDto findByUsername(String username) {
-        return userRepository.findByUsername(username).map(userMapper::toResponseDto).orElseThrow(
-                () -> new UserNotFoundException("Пользователь по заданному username: '%s' не был найден.".formatted(username))
-        );
+        return userRepository.findByUsername(username)
+                .map(userMapper::toResponseDto)
+                .orElseThrow(
+                        () -> new UserNotFoundException("Пользователь по заданному username: '%s' не был найден.".formatted(username))
+                );
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserResponseDto findByEmail(String email) {
-        return userRepository.findByEmail(email).map(userMapper::toResponseDto).orElseThrow(
-                () -> new UserNotFoundException("Пользователь по заданному email: '%s' не был найден.".formatted(email))
-        );
+        return userRepository.findByEmail(email)
+                .map(userMapper::toResponseDto)
+                .orElseThrow(
+                        () -> new UserNotFoundException("Пользователь по заданному email: '%s' не был найден.".formatted(email))
+                );
     }
 
     @Override
@@ -109,6 +118,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при частичном обновлении данных".formatted(id))
         );
         userMapper.updateEntityFromPatchDto(user, dto);
+        LOGGER.info("Успешное Обновление данных пользователя с id: {}", user.getId());
 
         return userMapper.toResponseDto(user);
     }
@@ -124,6 +134,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         try {
             if (passwordEncoder.matches(String.valueOf(oldPassword), user.getPassword())) {
                 user.setPassword(passwordEncoder.encode(String.valueOf(dto.newPassword())));
+                LOGGER.info("успешное обновление пароля пользователя с id:{}", user.getId());
                 return userMapper.toResponseDto(user);
             } else {
                 throw new UserPasswordMissMatchException("Несоответствие старого пароля");
@@ -155,5 +166,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
+        LOGGER.info("Удаление учетной записи пользователя с id: {}", id);
     }
 }

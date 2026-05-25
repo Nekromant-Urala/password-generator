@@ -54,7 +54,7 @@ public class EncryptionServiceImpl implements EncryptionService {
             return Base64.encode(encryptedDataWithMeta);
 
         } catch (Exception e) {
-            throw new EncryptionException("Ошибка шифрования.", e);
+            throw new EncryptionException(e);
         }
     }
 

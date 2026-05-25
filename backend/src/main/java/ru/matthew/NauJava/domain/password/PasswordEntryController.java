@@ -55,7 +55,7 @@ public class PasswordEntryController {
     @PostMapping("/create")
     public String createEntry(
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute("passwordEntryRequestDto") PasswordEntryRequestDto dto, //TODO навесить валидацию в dto
+            @ModelAttribute("passwordEntryRequestDto") PasswordEntryRequestDto dto,
             RedirectAttributes redirectAttributes
     ) {
 
@@ -74,7 +74,7 @@ public class PasswordEntryController {
     public String updateEntry(
             @PathVariable(name = "id") Long entryId,
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute("passwordEntryDto") PasswordEntryUpdateDto dto, //TODO навесить валидацию в dto
+            @ModelAttribute("passwordEntryDto") PasswordEntryUpdateDto dto,
             @RequestParam(name = "page", defaultValue = "0") int page,
             RedirectAttributes redirectAttributes
     ) {

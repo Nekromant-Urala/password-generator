@@ -1,6 +1,8 @@
 package ru.matthew.NauJava.domain.audit;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
@@ -21,6 +23,8 @@ public class AuditEventListener {
 
     private final AuditService auditService;
     private final UserService userService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuditEventListener.class);
 
     @Autowired
     public AuditEventListener(AuditService auditService, UserService userService) {
@@ -43,7 +47,7 @@ public class AuditEventListener {
         var authentication = event.getAuthentication();
         String username = authentication.getName();
 
-        writeLog(username, SIGN_IN_USER, "Пользователь вошел в систему");
+        writeLog(username, SIGN_IN_USER, "вошел в систему");
     }
 
     @EventListener
@@ -51,18 +55,20 @@ public class AuditEventListener {
         var authentication = event.getAuthentication();
         String username = authentication.getName();
 
-        writeLog(username, LOGOUT_USER, "Пользователь вышел из системы");
+        writeLog(username, LOGOUT_USER, "вышел из системы");
     }
 
     private void writeLog(String username, EventType event, String description) {
         var user = userService.findByUsername(username);
         if (user != null) {
+            var userAgent = getCurrentUserAgent();
             auditService.createEvent(new AuditCreateDto(
                     user.id(),
                     event,
-                    getCurrentUserAgent(),
+                    userAgent,
                     description
             ));
+            LOGGER.info("Пользователь с id:{} {}. С клиента: {}", user.id(), description, userAgent);
         }
     }
 

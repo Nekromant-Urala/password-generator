@@ -12,7 +12,7 @@ import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
 @Component
 public class ProfileMapper {
 
-    public Profile toGeneratorProfile(ProfileRequestDto dto) {
+    public Profile toProfile(ProfileRequestDto dto) {
         if (dto == null) {
             return null;
         }
@@ -20,7 +20,7 @@ public class ProfileMapper {
         var cipherAlgorithmSpec = CipherAlgorithmSpec.valueOf(dto.cipher());
         var kdfAlgorithmSpec = new KdfAlgorithmSpecConverter().convertToEntityAttribute(dto.kdfAlgorithm());
 
-        return new Profile.GeneratorProfileBuilder()
+        return new Profile.ProfileBuilder()
                 .name(dto.name())
                 .passwordLength(dto.passwordLength())
                 .uppercase(dto.isUppercase())
@@ -36,7 +36,7 @@ public class ProfileMapper {
                 .build();
     }
 
-    public void updateGeneratorProfileDto(Profile profile, ProfileUpdateDto dto) {
+    public void updateProfileDto(Profile profile, ProfileUpdateDto dto) {
         if (dto == null || profile == null) {
             return;
         }
@@ -73,7 +73,7 @@ public class ProfileMapper {
         );
     }
 
-    public ProfileResponseDto toGeneratorProfileResponseDto(Profile profile) {
+    public ProfileResponseDto toProfileResponseDto(Profile profile) {
         if (profile == null) {
             return null;
         }

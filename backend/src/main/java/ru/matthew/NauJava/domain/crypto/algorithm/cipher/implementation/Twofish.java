@@ -22,7 +22,7 @@ public class Twofish implements SymmetricCipher {
             cipher.init(Cipher.ENCRYPT_MODE, key, gcmSpec);
             return cipher.doFinal(byteArrayToEncrypt);
         } catch (Exception e) {
-            throw new EncryptionException("Ошибка при шифровании данных алгоритмом Twofish. ", e);
+            throw new EncryptionException(e);
         }
     }
 
@@ -34,7 +34,7 @@ public class Twofish implements SymmetricCipher {
             cipher.init(Cipher.DECRYPT_MODE, key, gcmSpec);
             return cipher.doFinal(byteArrayToDecrypt);
         } catch (Exception e) {
-            throw new EncryptionException("Ошибка при расшифровывании данных алгоритмом Twofish. ", e);
+            throw new EncryptionException(e);
         }
     }
 

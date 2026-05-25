@@ -43,7 +43,7 @@ public interface AuditService {
      * @param userAgent строка User-Agent из HTTP-запроса.
      * @return Список найденных записей {@link AuditResponseDto}.
      */
-    Page<AuditResponseDto> findByUserAgent(String userAgent, Pageable pageable);
+    Page<AuditResponseDto> findByUserAgent(Long userId, String userAgent, Pageable pageable);
 
     /**
      * Поиск записей аудита по дате их создания.

@@ -17,14 +17,14 @@ public interface AuditRepository extends JpaRepository<Audit, Long> {
      */
     Page<Audit> findAllByEventType(EventType type, Pageable pageable);
 
-//    /**
-//     * Поиск записей аудита по User-Agent клиента.
-//     *
-//     * @param userId уникальный идентификатор пользователя.
-//     * @param userAgent строка User-Agent из HTTP-запроса.
-//     * @return Список найденных записей {@link AuditResponseDto}.
-//     */
-//    Page<AuditResponseDto> findAllByUserAgent(Long userId, String userAgent, Pageable pageable);
+    /**
+     * Поиск записей аудита по User-Agent клиента.
+     *
+     * @param userId уникальный идентификатор пользователя.
+     * @param userAgent строка User-Agent из HTTP-запроса.
+     * @return Список найденных записей {@link AuditResponseDto}.
+     */
+    Page<Audit> findAllByUserIdAndUserAgent(Long userId, String userAgent, Pageable pageable);
 
     /**
      * Поиск записей аудита по дате их создания.
@@ -41,28 +41,6 @@ public interface AuditRepository extends JpaRepository<Audit, Long> {
      * @return Список найденных записей {@link AuditResponseDto}.
      */
     Page<Audit> findAllByUserId(Long userId, Pageable pageable);
-
-
-//    /**
-//     * Подсчитывает количество всех пользователей в системе
-//     *
-//     * @return количество всех пользователей системы
-//     */
-//    long countAllUser();
-
-//    /**
-//     * Подсчитывает количество пользователей за последние 24 часа
-//     *
-//     * @return количество всех пользователей системы зарегистрированных за последние 24 часа
-//     */
-//    long countAllUserForLastDay();
-
-//    /**
-//     * Подсчитывает количество сгенерированных записей/паролей за всё время
-//     *
-//     * @return количество сгенерированных записей за все время
-//     */
-//    long countAllPasswordEntry();
 
     /**
      * Удаление всех записей аудита, связанных с конкретным пользователем.
@@ -90,5 +68,5 @@ public interface AuditRepository extends JpaRepository<Audit, Long> {
      *
      * @param userAgent строка User-Agent.
      */
-    void deleteByUserAgent(String userAgent);
+    void deleteByUserIdAndUserAgent(Long userId, String userAgent);
 }
