@@ -32,7 +32,7 @@ public interface AuditRepository extends JpaRepository<Audit, Long> {
      * @param createdAt дата и время создания записи.
      * @return Список найденных записей {@link AuditResponseDto}.
      */
-    Page<Audit> findAllByCreatedAt(LocalDateTime createdAt, Pageable pageable);
+    Page<Audit> findByCreatedAt(LocalDateTime createdAt, Pageable pageable);
 
     /**
      * Поиск записей аудита, связанных с определенным пользователем.
@@ -61,7 +61,7 @@ public interface AuditRepository extends JpaRepository<Audit, Long> {
      *
      * @param createdAt дата и время создания.
      */
-    void deleteAllByCreatedAt(LocalDateTime createdAt);
+    void deleteByCreatedAt(LocalDateTime createdAt);
 
     /**
      * Удаление записей аудита по-указанному User-Agent.

@@ -142,14 +142,14 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     @Override
     @Transactional(readOnly = true)
     public Page<PasswordEntryResponseDto> findByCreatedAt(Long userId, LocalDateTime createdAt, Pageable pageable) {
-        return passwordEntryRepository.findAllByUserIdAndCreatedAt(userId, createdAt, pageable)
+        return passwordEntryRepository.findByUserIdAndCreatedAt(userId, createdAt, pageable)
                 .map(passwordEntryMapper::toPasswordEntryResponseDto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<PasswordEntryResponseDto> findByUpdatedAt(Long userId, LocalDateTime updatedAt, Pageable pageable) {
-        return passwordEntryRepository.findAllByUserIdAndUpdatedAt(userId, updatedAt, pageable)
+        return passwordEntryRepository.findByUserIdAndUpdatedAt(userId, updatedAt, pageable)
                 .map(passwordEntryMapper::toPasswordEntryResponseDto);
     }
 
@@ -157,7 +157,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     @Override
     @Transactional(readOnly = true)
     public List<PasswordEntryResponseDto> findAllForUser(Long userId) {
-        return passwordEntryRepository.findByUserId(userId).stream()
+        return passwordEntryRepository.findAllByUserId(userId).stream()
                 .map(passwordEntryMapper::toPasswordEntryResponseDto)
                 .toList();
     }
@@ -165,7 +165,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
     @Override
     @Transactional(readOnly = true)
     public Page<PasswordEntryResponseDto> findAllByPageForUser(Long userId, Pageable pageable) {
-        return passwordEntryRepository.findByUserId(userId, pageable)
+        return passwordEntryRepository.findAllByUserId(userId, pageable)
                 .map(passwordEntryMapper::toPasswordEntryResponseDto);
     }
 

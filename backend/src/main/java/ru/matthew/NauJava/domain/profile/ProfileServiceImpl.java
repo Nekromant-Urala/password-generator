@@ -80,7 +80,7 @@ public class ProfileServiceImpl implements ProfileService {
                 .lowercase(true)
                 .digits(true)
                 .specialChars(true)
-                .avoidAmbiguousChars(false)
+                .duplicateChars(false)
                 .favorite(true)
                 .customChars("")
                 .kdfAlgorithm(Pbkdf2Spec.PBKDF_2)

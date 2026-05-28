@@ -74,7 +74,7 @@ public class Profile {
         this.isLowercase = builder.isLowercase;
         this.isDigits = builder.isDigits;
         this.isSpecialChars = builder.isSpecialChars;
-        this.isDuplicateChars = builder.isAvoidAmbiguousChars;
+        this.isDuplicateChars = builder.isDuplicateChars;
         this.isFavorite = builder.isFavorite;
         this.customChars = builder.customChars;
         this.kdfAlgorithm = builder.kdfAlgorithm;
@@ -89,7 +89,7 @@ public class Profile {
         private boolean isLowercase;
         private boolean isDigits;
         private boolean isSpecialChars;
-        private boolean isAvoidAmbiguousChars;
+        private boolean isDuplicateChars;
         private boolean isFavorite;
         private String customChars;
         private KdfAlgorithmSpec kdfAlgorithm;
@@ -126,8 +126,8 @@ public class Profile {
             return this;
         }
 
-        public ProfileBuilder avoidAmbiguousChars(boolean avoidAmbiguousChars) {
-            isAvoidAmbiguousChars = avoidAmbiguousChars;
+        public ProfileBuilder duplicateChars(boolean avoidAmbiguousChars) {
+            isDuplicateChars = avoidAmbiguousChars;
             return this;
         }
 

@@ -38,7 +38,7 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      * @param createdAt дата создания записей.
      * @return Список найденных записей {@link PasswordEntry}.
      */
-    Page<PasswordEntry> findAllByUserIdAndCreatedAt(Long userId, LocalDateTime createdAt, Pageable pageable);
+    Page<PasswordEntry> findByUserIdAndCreatedAt(Long userId, LocalDateTime createdAt, Pageable pageable);
 
     /**
      * Выполняет поиск записей паролей по дате последнего обновления.
@@ -47,7 +47,7 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      * @param updatedAt дата последнего обновления.
      * @return Список найденных записей {@link PasswordEntry}.
      */
-    Page<PasswordEntry> findAllByUserIdAndUpdatedAt(Long userId, LocalDateTime updatedAt, Pageable pageable);
+    Page<PasswordEntry> findByUserIdAndUpdatedAt(Long userId, LocalDateTime updatedAt, Pageable pageable);
 
     /**
      * Возвращает записи постранично
@@ -56,7 +56,7 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      * @param pageable объект, содержащий информацию о номере страницы, размере и сортировке
      * @return страница с найденными записями.
      */
-    Page<PasswordEntry> findByUserId(Long userId, Pageable pageable);
+    Page<PasswordEntry> findAllByUserId(Long userId, Pageable pageable);
 
     /**
      * Выполняет поиск записи пароля, связанной с конкретным пользователем.
@@ -65,7 +65,7 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      * @return Возвращает список объектов {@link PasswordEntry} с данными найденного пользователя.
      */
     @Query("SELECT p FROM PasswordEntry p WHERE p.user.id = :userId")
-    List<PasswordEntry> findByUserId(@Param("userId") Long userId);
+    List<PasswordEntry> findAllByUserId(@Param("userId") Long userId);
 
     /**
      * Выполняет поиск записи пароля, связанной с конкретным пользователем.
@@ -74,7 +74,7 @@ public interface PasswordEntryRepository extends JpaRepository<PasswordEntry, Lo
      * @return Возвращает список объектов {@link PasswordEntry} с данными найденного пользователя.
      */
     @Query("SELECT p FROM PasswordEntry p WHERE p.user.username = :username")
-    List<PasswordEntry> findByUsername(@Param("username") String username);
+    List<PasswordEntry> findAllByUsername(@Param("username") String username);
 
     /**
      * Подсчет количества записей конкретного пользователя

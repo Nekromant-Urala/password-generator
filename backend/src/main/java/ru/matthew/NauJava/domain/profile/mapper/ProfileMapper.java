@@ -27,7 +27,7 @@ public class ProfileMapper {
                 .lowercase(dto.isLowercase())
                 .digits(dto.isDigits())
                 .specialChars(dto.isSpecialChars())
-                .avoidAmbiguousChars(dto.isDuplicateChars())
+                .duplicateChars(dto.isDuplicateChars())
                 .favorite(dto.isFavorite())
                 .customChars(dto.customChars())
                 .kdfAlgorithm(kdfAlgorithmSpec)

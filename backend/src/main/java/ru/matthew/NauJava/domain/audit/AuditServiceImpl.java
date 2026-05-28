@@ -78,7 +78,7 @@ public class AuditServiceImpl implements AuditService {
     @Override
     @Transactional(readOnly = true)
     public Page<AuditResponseDto> findByCreatedAt(LocalDateTime createdAt, Pageable pageable) {
-        return auditRepository.findAllByCreatedAt(createdAt, pageable)
+        return auditRepository.findByCreatedAt(createdAt, pageable)
                 .map(auditMapper::toAuditResponseDto);
     }
 
@@ -150,7 +150,7 @@ public class AuditServiceImpl implements AuditService {
 
     @Override
     public void deleteByCreatedAt(LocalDateTime createdAt) {
-        auditRepository.deleteAllByCreatedAt(createdAt);
+        auditRepository.deleteByCreatedAt(createdAt);
         LOGGER.info("Удаление всей истории аудита c датой создания события:{}", createdAt);
     }
 }
