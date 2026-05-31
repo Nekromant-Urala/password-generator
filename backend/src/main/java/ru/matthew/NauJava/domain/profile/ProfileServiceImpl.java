@@ -14,7 +14,7 @@ import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpe
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.Pbkdf2Spec;
 import ru.matthew.NauJava.domain.profile.dto.ProfileRequestDto;
 import ru.matthew.NauJava.domain.profile.dto.ProfileResponseDto;
-import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
+import ru.matthew.NauJava.domain.profile.exception.ProfileAlreadyExistsException;
 import ru.matthew.NauJava.domain.profile.exception.ProfileNotFoundException;
 import ru.matthew.NauJava.domain.profile.mapper.ProfileMapper;
 import ru.matthew.NauJava.domain.user.UserRepository;
@@ -42,7 +42,8 @@ public class ProfileServiceImpl implements ProfileService {
     public ProfileServiceImpl(
             UserRepository userRepository,
             ProfileRepository profileRepository,
-            ProfileMapper profileMapper, ApplicationEventPublisher eventPublisher
+            ProfileMapper profileMapper,
+            ApplicationEventPublisher eventPublisher
     ) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
@@ -56,20 +57,24 @@ public class ProfileServiceImpl implements ProfileService {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(userId)
         );
+        if (profileRepository.findByUserIdAndName(userId, dto.name()).isPresent()) {
+            throw new ProfileAlreadyExistsException("Профиль-генерации с таким именем уже существует");
+        }
+
         var profile = profileMapper.toProfile(dto);
 
         profile.setUser(user);
         user.addProfile(profile);
-        profileRepository.save(profile);
+        var savedProfile = profileRepository.save(profile);
 
         eventPublisher.publishEvent(new AuditEventDto(userId, CREATE_PROFILE, "создание профиля-генерации"));
         LOGGER.info("Создание профайла-генерация пользователем с id:{}", userId);
 
-        return profileMapper.toProfileResponseDto(profile);
+        return profileMapper.toProfileResponseDto(savedProfile);
     }
 
     @Override
-    public ProfileResponseDto createDefaultProfile(Long userId) {
+    public void createDefaultProfile(Long userId) {
         var user = userRepository.findById(userId).orElseThrow(
                 () -> new UserNotFoundException(userId)
         );
@@ -80,12 +85,11 @@ public class ProfileServiceImpl implements ProfileService {
                 .lowercase(true)
                 .digits(true)
                 .specialChars(true)
-                .duplicateChars(false)
+                .duplicateChars(true)
                 .favorite(true)
                 .customChars("")
                 .kdfAlgorithm(Pbkdf2Spec.PBKDF_2)
                 .cipher(CipherAlgorithmSpec.AES)
-                .iterations(1000)
                 .build();
 
         defaultProfile.setUser(user);
@@ -93,7 +97,23 @@ public class ProfileServiceImpl implements ProfileService {
         LOGGER.info("Создание профайла по умолчанию для пользователя с id:{}", userId);
 
         profileRepository.save(defaultProfile);
-        return profileMapper.toProfileResponseDto(defaultProfile);
+    }
+
+    @Override
+    public void setProfileAsFavorite(Long userId, Long profileId) {
+        Profile profileToActivate = profileRepository.findById(profileId)
+                .filter(p -> p.getUser().getId().equals(userId))
+                .orElseThrow(() -> new ProfileNotFoundException("Профиль не найден или не принадлежит пользователю"));
+
+        if (profileToActivate.isFavorite()) {
+            return;
+        }
+
+        profileRepository.resetFavoriteProfileForUser(userId);
+        profileToActivate.setFavorite(true);
+
+        profileRepository.save(profileToActivate);
+        eventPublisher.publishEvent(new AuditEventDto(userId, UPDATE_PROFILE, "смена активного профиля"));
     }
 
     @Override
@@ -151,10 +171,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileResponseDto updateSettings(Long id, ProfileUpdateDto dto) {
-        var profile = profileRepository.findById(id).orElseThrow(
-                () -> new ProfileNotFoundException(id)
-        );
+    public ProfileResponseDto updateSettings(Long userId, Long id, ProfileRequestDto dto) {
+        var profile = profileRepository.findById(id)
+                .filter(p -> p.getUser().getId().equals(userId))
+                .orElseThrow(() -> new ProfileNotFoundException(id));
+
         profileMapper.updateProfileDto(profile, dto);
 
         eventPublisher.publishEvent(new AuditEventDto(profile.getUser().getId(), UPDATE_PROFILE, "обновление настроек профиля-генерации"));

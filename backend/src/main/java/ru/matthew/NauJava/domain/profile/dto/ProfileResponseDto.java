@@ -1,12 +1,10 @@
 package ru.matthew.NauJava.domain.profile.dto;
 
-import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
-import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.KdfAlgorithmSpec;
-
 import java.time.LocalDateTime;
 
 public record ProfileResponseDto(
         Long id,
+        Long userId,
         String name,
         Integer passwordLength,
         boolean isUppercase,
@@ -17,8 +15,7 @@ public record ProfileResponseDto(
         boolean isFavorite,
         String customChars,
         LocalDateTime createAt,
-        KdfAlgorithmSpec kdfAlgorithm,
-        CipherAlgorithmSpec cipher,
-        Integer iterations
+        String kdfAlgorithm,
+        String cipher
 ) {
 }

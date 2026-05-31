@@ -21,10 +21,10 @@ public class UserMapper {
         if (user == null || dto == null) {
             return;
         }
-        if (dto.username() != null) {
+        if (dto.username() != null && !dto.username().isEmpty()) {
             user.setUsername(dto.username());
         }
-        if (dto.email() != null) {
+        if (dto.email() != null && !dto.email().isEmpty()) {
             user.setEmail(dto.email());
         }
     }

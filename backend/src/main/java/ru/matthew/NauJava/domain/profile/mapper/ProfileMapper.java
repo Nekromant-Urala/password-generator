@@ -7,7 +7,6 @@ import ru.matthew.NauJava.domain.profile.Profile;
 import ru.matthew.NauJava.domain.profile.dto.ProfileForPasswordDto;
 import ru.matthew.NauJava.domain.profile.dto.ProfileRequestDto;
 import ru.matthew.NauJava.domain.profile.dto.ProfileResponseDto;
-import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
 
 @Component
 public class ProfileMapper {
@@ -32,11 +31,10 @@ public class ProfileMapper {
                 .customChars(dto.customChars())
                 .kdfAlgorithm(kdfAlgorithmSpec)
                 .cipher(cipherAlgorithmSpec)
-                .iterations(dto.iterations())
                 .build();
     }
 
-    public void updateProfileDto(Profile profile, ProfileUpdateDto dto) {
+    public void updateProfileDto(Profile profile, ProfileRequestDto dto) {
         if (dto == null || profile == null) {
             return;
         }
@@ -55,7 +53,6 @@ public class ProfileMapper {
         profile.setCustomChars(dto.customChars());
         profile.setKdfAlgorithm(kdfAlgorithmSpec);
         profile.setCipher(cipherAlgorithmSpec);
-        profile.setIterations(dto.iterations());
     }
 
     public ProfileForPasswordDto toProfileForPasswordDto(Profile profile) {
@@ -79,6 +76,7 @@ public class ProfileMapper {
         }
         return new ProfileResponseDto(
                 profile.getId(),
+                profile.getUser().getId(),
                 profile.getName(),
                 profile.getPasswordLength(),
                 profile.isUppercase(),
@@ -89,9 +87,8 @@ public class ProfileMapper {
                 profile.isFavorite(),
                 profile.getCustomChars(),
                 profile.getCreateAt(),
-                profile.getKdfAlgorithm(),
-                profile.getCipher(),
-                profile.getIterations()
+                profile.getKdfAlgorithm().getName(),
+                profile.getCipher().getName()
         );
     }
 }

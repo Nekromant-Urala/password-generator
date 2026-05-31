@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 
 import ru.matthew.NauJava.domain.profile.dto.ProfileRequestDto;
 import ru.matthew.NauJava.domain.profile.dto.ProfileResponseDto;
-import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
 import ru.matthew.NauJava.domain.profile.exception.ProfileNotFoundException;
 
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
@@ -36,7 +35,15 @@ public interface ProfileService {
      * @return Созданный профиль {@link ProfileResponseDto}
      * @throws {@link UserNotFoundException} в случае если пользователь не был найден
      */
-    ProfileResponseDto createDefaultProfile(Long userId);
+    void createDefaultProfile(Long userId);
+
+    /**
+     * Устанавливает новый профиль генерации по умолчанию
+     *
+     * @param userId уникальный идентификатор пользователя
+     * @param profileId уникальный идентификатор профайла генерации
+     */
+    void setProfileAsFavorite(Long userId, Long profileId);
 
     /**
      * Поиск профиля по уникальному идентификатору
@@ -102,11 +109,12 @@ public interface ProfileService {
     /**
      * Обновляет базовые настройки профиля генерации
      *
+     * @param userId уникальный идентификатор пользователя
      * @param id  уникальный идентификатор профайла
-     * @param dto новые настройки {@link ProfileUpdateDto}
+     * @param dto новые настройки {@link ProfileRequestDto}
      * @return Обновленный профиль {@link ProfileResponseDto}
      */
-    ProfileResponseDto updateSettings(Long id, ProfileUpdateDto dto);
+    ProfileResponseDto updateSettings(Long userId, Long id, ProfileRequestDto dto);
 
     /**
      * Удаляет все профили, принадлежащие указанному пользователю

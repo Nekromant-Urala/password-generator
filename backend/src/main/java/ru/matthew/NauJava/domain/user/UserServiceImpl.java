@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ru.matthew.NauJava.domain.audit.EventType;
 import ru.matthew.NauJava.domain.audit.dto.AuditEventDto;
 import ru.matthew.NauJava.domain.profile.ProfileService;
 import ru.matthew.NauJava.domain.user.dto.*;
@@ -117,8 +118,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         var user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при частичном обновлении данных".formatted(id))
         );
+        if (userRepository.findByUsername(dto.username()).isPresent()) {
+            throw new UserAlreadyExistsException("Пользователь с таким именем уже существует");
+        }
+        if (userRepository.findByEmail(dto.email()).isPresent()) {
+            throw new UserAlreadyExistsException("Пользователь с такой почтой уже зарегистрирован");
+        }
         userMapper.updateEntityFromPatchDto(user, dto);
-        LOGGER.info("Успешное Обновление данных пользователя с id: {}", user.getId());
+        LOGGER.info("Успешное обновление данных пользователя с id: {}", user.getId());
 
         return userMapper.toResponseDto(user);
     }
@@ -146,7 +153,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (username == null || username.isBlank()) {
             throw new UsernameNotFoundException("Пустой логин");
         }
@@ -160,7 +167,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                         u.getPassword(),
                         Collections.singleton(u.getRole())
                 ))
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с username: '%s' не был найден".formatted(username)));
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username: '%s' не был найден".formatted(username)));
     }
 
     @Override

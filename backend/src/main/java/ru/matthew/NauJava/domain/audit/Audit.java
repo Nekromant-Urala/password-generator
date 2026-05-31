@@ -15,22 +15,22 @@ public class Audit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "event_type")
+    @Column(name = "event_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
-    @Column(name = "event_description")
+    @Column(name = "event_description", length = 300)
     private String description;
 
-    @Column(name = "user_agent")
+    @Column(name = "user_agent", length = 300)
     private String userAgent;
 
     @CreationTimestamp
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne()
-    @JoinColumn(name = "user_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Long getId() {

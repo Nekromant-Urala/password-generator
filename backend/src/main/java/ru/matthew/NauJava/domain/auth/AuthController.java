@@ -1,5 +1,6 @@
 package ru.matthew.NauJava.domain.auth;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public String singUp(@ModelAttribute UserCreateDto user, RedirectAttributes redirectAttributes) {
+    public String singUp(@Valid @ModelAttribute UserCreateDto user, RedirectAttributes redirectAttributes) {
         try {
             authenticationService.singUp(user);
             redirectAttributes.addFlashAttribute("success", "Регистрация успешна! Войдите в систему.");

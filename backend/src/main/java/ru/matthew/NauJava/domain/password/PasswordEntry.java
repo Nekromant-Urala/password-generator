@@ -17,32 +17,32 @@ public class PasswordEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login")
+    @Column(name = "login", nullable = false)
     private String login;
 
-    @Column(name = "encrypt_password", columnDefinition = "TEXT")
+    @Column(name = "encrypt_password", columnDefinition = "TEXT", nullable = false)
     private String password;
 
     @CreationTimestamp
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "service_name")
+    @Column(name = "service_name", nullable = false)
     private String serviceName;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "profile_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "profile_id", nullable = false)
     private Profile profile;
 
     public Long getId() {

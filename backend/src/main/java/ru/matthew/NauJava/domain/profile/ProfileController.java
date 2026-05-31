@@ -1,5 +1,6 @@
 package ru.matthew.NauJava.domain.profile;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -10,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.matthew.NauJava.domain.profile.dto.ProfileRequestDto;
-import ru.matthew.NauJava.domain.profile.dto.ProfileUpdateDto;
 import ru.matthew.NauJava.domain.user.UserService;
 
 @Controller
@@ -58,7 +58,7 @@ public class ProfileController {
     @PostMapping("/create")
     public String createProfile(
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute("profileCreateDto") ProfileRequestDto dto,
+            @Valid @ModelAttribute("profileCreateDto") ProfileRequestDto dto,
             RedirectAttributes redirectAttributes
     ) {
         var userDto = userService.findByUsername(userDetails.getUsername());
@@ -76,12 +76,12 @@ public class ProfileController {
     public String updateProfile(
             @PathVariable(name = "id") Long profileId,
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute("profileUpdateDto") ProfileUpdateDto dto,
+            @Valid @ModelAttribute("profileRequestDto") ProfileRequestDto dto,
             @RequestParam(name = "page", defaultValue = "0") int page,
             RedirectAttributes redirectAttributes
     ) {
         var userDto = userService.findByUsername(userDetails.getUsername());
-        var profile = profileService.updateSettings(profileId, dto);
+        var profile = profileService.updateSettings(userDto.id(), profileId, dto);
         if (profile == null) {
             redirectAttributes.addFlashAttribute("profileError", "Профиль не обновлена.");
         } else {

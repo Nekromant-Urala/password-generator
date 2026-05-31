@@ -18,49 +18,46 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "password_length")
+    @Column(name = "password_length", nullable = false)
     private Integer passwordLength;
 
-    @Column(name = "include_uppercase")
+    @Column(name = "include_uppercase", nullable = false)
     private boolean isUppercase;
 
-    @Column(name = "include_lowercase")
+    @Column(name = "include_lowercase", nullable = false)
     private boolean isLowercase;
 
-    @Column(name = "include_digits")
+    @Column(name = "include_digits", nullable = false)
     private boolean isDigits;
 
-    @Column(name = "include_special_chars")
+    @Column(name = "include_special_chars", nullable = false)
     private boolean isSpecialChars;
 
-    @Column(name = "avoid_ambiguous_chars")
+    @Column(name = "avoid_ambiguous_chars", nullable = false)
     private boolean isDuplicateChars;
 
-    @Column(name = "is_favorite")
+    @Column(name = "is_favorite", nullable = false)
     private boolean isFavorite;
 
     @Column(name = "custom_chars")
     private String customChars;
 
     @CreationTimestamp
-    @Column(name = "create_at")
+    @Column(name = "create_at", updatable = false, nullable = false)
     private LocalDateTime createAt;
 
-    @Column(name = "kdf_algorithm")
+    @Column(name = "kdf_algorithm", nullable = false)
     @Convert(converter = KdfAlgorithmSpecConverter.class)
     private KdfAlgorithmSpec kdfAlgorithm;
 
-    @Column(name = "cipher_algorithm")
+    @Column(name = "cipher_algorithm", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private CipherAlgorithmSpec cipher;
 
-    @Column(name = "iterations")
-    private Integer iterations;
-
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -79,7 +76,6 @@ public class Profile {
         this.customChars = builder.customChars;
         this.kdfAlgorithm = builder.kdfAlgorithm;
         this.cipher = builder.cipher;
-        this.iterations = builder.iterations;
     }
 
     public static class ProfileBuilder {
@@ -94,7 +90,6 @@ public class Profile {
         private String customChars;
         private KdfAlgorithmSpec kdfAlgorithm;
         private CipherAlgorithmSpec cipher;
-        private Integer iterations;
 
         public ProfileBuilder name(String name) {
             this.name = name;
@@ -126,8 +121,8 @@ public class Profile {
             return this;
         }
 
-        public ProfileBuilder duplicateChars(boolean avoidAmbiguousChars) {
-            isDuplicateChars = avoidAmbiguousChars;
+        public ProfileBuilder duplicateChars(boolean isDuplicate) {
+            isDuplicateChars = isDuplicate;
             return this;
         }
 
@@ -148,11 +143,6 @@ public class Profile {
 
         public ProfileBuilder cipher(CipherAlgorithmSpec cipher) {
             this.cipher = cipher;
-            return this;
-        }
-
-        public ProfileBuilder iterations(Integer iterations) {
-            this.iterations = iterations;
             return this;
         }
 
@@ -272,13 +262,5 @@ public class Profile {
 
     public void setCipher(CipherAlgorithmSpec cipher) {
         this.cipher = cipher;
-    }
-
-    public Integer getIterations() {
-        return iterations;
-    }
-
-    public void setIterations(Integer iterations) {
-        this.iterations = iterations;
     }
 }

@@ -26,13 +26,15 @@ public class AuditMapper {
             long totalEvent,
             long totalUser,
             long totalEntries,
-            long totalUsersForLastDay
+            long totalUsersForLastDay,
+            String popularCipher
     ) {
         return new AuditStatsResponseDto(
                 totalEvent,
                 totalUser,
                 totalEntries,
-                totalUsersForLastDay
+                totalUsersForLastDay,
+                popularCipher
         );
     }
 

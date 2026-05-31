@@ -73,15 +73,6 @@ public interface PasswordEntryService {
     Page<PasswordEntryResponseDto> findByUpdatedAt(Long userId, LocalDateTime updatedAt, Pageable pageable);
 
     /**
-     * Выполняет поиск всех записей, связанных с конкретным пользователем.
-     *
-     * @param userId DTO с данными пользователя, для которого выполняется поиск
-     * @return Возвращает список объектов {@link PasswordEntryResponseDto} с данными найденного записи.
-     * @throws {@link PasswordEntryNotFoundException} если запись с заданным id не существует.
-     */
-    List<PasswordEntryResponseDto> findAllForUser(Long userId);
-
-    /**
      * Возвращает все записи (постранично) для конкретного пользователя
      *
      * @param userId уникальный идентификатор пользователя

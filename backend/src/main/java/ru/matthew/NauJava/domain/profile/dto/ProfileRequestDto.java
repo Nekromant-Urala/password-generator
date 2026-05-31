@@ -1,8 +1,15 @@
 package ru.matthew.NauJava.domain.profile.dto;
 
 
+import jakarta.validation.constraints.*;
+
 public record ProfileRequestDto(
+        @NotBlank(message = "имя профиля не может быть пустым")
+        @Size(max = 100, message = "имя профиля не должно превышать 100 символов")
         String name,
+        @NotNull
+        @Positive
+        @Max(value = 128, message = "максимальная длина пароля 128 символов")
         int passwordLength,
         Boolean isUppercase,
         Boolean isLowercase,
@@ -10,10 +17,12 @@ public record ProfileRequestDto(
         Boolean isSpecialChars,
         Boolean isDuplicateChars,
         Boolean isFavorite,
+        @Size(max = 255, message = "список кастомных символов слишком большой")
         String customChars,
+        @NotNull(message = "необходимо задавать алгоритм kdf")
         String kdfAlgorithm,
-        String cipher,
-        int iterations
+        @NotNull(message = "необходимо задать алгоритм шифрования")
+        String cipher
 ) {
     public ProfileRequestDto {
         if (isUppercase == null) {

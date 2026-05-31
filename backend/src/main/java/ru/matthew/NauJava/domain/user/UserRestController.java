@@ -1,5 +1,6 @@
 package ru.matthew.NauJava.domain.user;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class UserRestController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserCreateDto userCreateDto) {
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserCreateDto userCreateDto) {
         var user = userService.createUser(userCreateDto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
@@ -55,7 +56,7 @@ public class UserRestController {
     @PatchMapping("/details")
     public ResponseEntity<UserResponseDto> patchUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody UserPatchDto dto
+            @Valid @RequestBody UserPatchDto dto
     ) {
         var user = userService.patchUser(userDetails.id(), dto);
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -64,7 +65,7 @@ public class UserRestController {
     @PutMapping("/password")
     public ResponseEntity<UserResponseDto> updatePassword(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody UserUpdatePasswordDto passwordDto
+            @Valid @RequestBody UserUpdatePasswordDto passwordDto
     ) {
         try {
             var user = userService.updatePassword(userDetails.id(), passwordDto);

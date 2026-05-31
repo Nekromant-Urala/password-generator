@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,11 +15,14 @@ import ru.matthew.NauJava.domain.audit.dto.AuditResponseDto;
 import ru.matthew.NauJava.domain.audit.dto.AuditStatsResponseDto;
 import ru.matthew.NauJava.domain.audit.exception.AuditEventNotFoundException;
 import ru.matthew.NauJava.domain.audit.mapper.AuditMapper;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
 import ru.matthew.NauJava.domain.password.PasswordEntryRepository;
+import ru.matthew.NauJava.domain.profile.ProfileRepository;
 import ru.matthew.NauJava.domain.user.UserRepository;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional
@@ -26,15 +31,22 @@ public class AuditServiceImpl implements AuditService {
     private final AuditMapper auditMapper;
     private final AuditRepository auditRepository;
     private final UserRepository userRepository;
+    private final ProfileRepository profileRepository;
     private final PasswordEntryRepository passwordEntryRepository;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditServiceImpl.class);
 
     @Autowired
-    public AuditServiceImpl(AuditMapper auditMapper, AuditRepository auditRepository, UserRepository userRepository, PasswordEntryRepository passwordEntryRepository) {
+    public AuditServiceImpl(
+            AuditMapper auditMapper,
+            AuditRepository auditRepository,
+            UserRepository userRepository, ProfileRepository profileRepository,
+            PasswordEntryRepository passwordEntryRepository
+    ) {
         this.auditMapper = auditMapper;
         this.auditRepository = auditRepository;
         this.userRepository = userRepository;
+        this.profileRepository = profileRepository;
         this.passwordEntryRepository = passwordEntryRepository;
     }
 
@@ -46,9 +58,9 @@ public class AuditServiceImpl implements AuditService {
         );
         event.setUser(user);
 
-        auditRepository.save(event);
-        LOGGER.debug("Событие для аудита сохранено. Пользователь с id:{}, тип события: {}", user.getId(), event.getEventType());
-        return auditMapper.toAuditResponseDto(event);
+        var savedEvent = auditRepository.save(event);
+        LOGGER.debug("Событие для аудита сохранено. Пользователь с id:{}, тип события: {}", user.getId(), savedEvent.getEventType());
+        return auditMapper.toAuditResponseDto(savedEvent);
     }
 
     @Override
@@ -111,7 +123,7 @@ public class AuditServiceImpl implements AuditService {
     @Override
     @Transactional(readOnly = true)
     public long countAllUserForLastDay() {
-        return 0L;
+        return userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(1));
     }
 
     @Override
@@ -121,12 +133,24 @@ public class AuditServiceImpl implements AuditService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public String getMostPopularCipher() {
+        return profileRepository
+                .findMostPopularAlgorithm(PageRequest.of(0, 1))
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("не удалось найти самый популярный алгоритм"))
+                .getName();
+    }
+
+    @Override
     public AuditStatsResponseDto getAllStatsSystem() {
         return auditMapper.toAuditStatsResponseDto(
                 countAllEvent(),
                 countAllUser(),
                 countAllPasswordEntries(),
-                countAllUserForLastDay()
+                countAllUserForLastDay(),
+                getMostPopularCipher()
         );
     }
 

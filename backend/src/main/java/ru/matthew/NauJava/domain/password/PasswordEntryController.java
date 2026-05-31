@@ -1,5 +1,6 @@
 package ru.matthew.NauJava.domain.password;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,7 +56,7 @@ public class PasswordEntryController {
     @PostMapping("/create")
     public String createEntry(
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute("passwordEntryRequestDto") PasswordEntryRequestDto dto,
+            @Valid @ModelAttribute("passwordEntryRequestDto") PasswordEntryRequestDto dto,
             RedirectAttributes redirectAttributes
     ) {
 
@@ -74,7 +75,7 @@ public class PasswordEntryController {
     public String updateEntry(
             @PathVariable(name = "id") Long entryId,
             @AuthenticationPrincipal UserDetails userDetails,
-            @ModelAttribute("passwordEntryDto") PasswordEntryUpdateDto dto,
+            @Valid @ModelAttribute("passwordEntryDto") PasswordEntryUpdateDto dto,
             @RequestParam(name = "page", defaultValue = "0") int page,
             RedirectAttributes redirectAttributes
     ) {

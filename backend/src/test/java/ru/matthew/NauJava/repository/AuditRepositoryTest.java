@@ -14,7 +14,10 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.matthew.NauJava.domain.audit.Audit;
 import ru.matthew.NauJava.domain.audit.AuditRepository;
 import ru.matthew.NauJava.domain.audit.EventType;
+import ru.matthew.NauJava.domain.user.Role;
 import ru.matthew.NauJava.domain.user.User;
+
+import java.time.LocalDateTime;
 
 import static ru.matthew.NauJava.domain.audit.EventType.*;
 
@@ -37,6 +40,9 @@ public class AuditRepositoryTest {
         var user = new User();
         user.setUsername(username);
         user.setEmail(email);
+        user.setPassword("hash_password");
+        user.setCreatedAt(LocalDateTime.now());
+        user.setRole(Role.USER);
         return user;
     }
 
@@ -173,13 +179,14 @@ public class AuditRepositoryTest {
         event5.setUser(oUser);
         event6.setUser(oUser);
 
+        entityManager.persist(oUser);
         entityManager.persist(event1);
         entityManager.persist(event2);
         entityManager.persist(event3);
         entityManager.persist(event4);
         entityManager.persist(event5);
         entityManager.persist(event6);
-        entityManager.persist(oUser);
+
 
         entityManager.flush();
         entityManager.clear();
@@ -215,6 +222,7 @@ public class AuditRepositoryTest {
         event5.setUser(oUser);
         event6.setUser(oUser);
 
+        entityManager.persist(oUser);
         entityManager.persist(event1);
         entityManager.persist(event2);
         entityManager.persist(event22);
@@ -222,7 +230,6 @@ public class AuditRepositoryTest {
         entityManager.persist(event4);
         entityManager.persist(event5);
         entityManager.persist(event6);
-        entityManager.persist(oUser);
 
         entityManager.flush();
         entityManager.clear();
@@ -250,12 +257,13 @@ public class AuditRepositoryTest {
         event4.setUser(oUser);
         event5.setUser(oUser);
 
+        entityManager.persist(oUser);
         entityManager.persist(event1);
         entityManager.persist(event2);
         entityManager.persist(event3);
         entityManager.persist(event4);
         entityManager.persist(event5);
-        entityManager.persist(oUser);
+
 
         entityManager.flush();
         entityManager.clear();

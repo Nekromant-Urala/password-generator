@@ -25,7 +25,7 @@ public class ProfileRestController {
     @PostMapping
     public ResponseEntity<ProfileResponseDto> createProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody ProfileRequestDto dto
+            @Valid @RequestBody ProfileRequestDto dto
     ) {
         var profile = profileService.createProfile(userDetails.id(), dto);
         return new ResponseEntity<>(profile, HttpStatus.OK);
@@ -77,9 +77,10 @@ public class ProfileRestController {
     @PutMapping("/{id}")
     public ResponseEntity<ProfileResponseDto> updateSettings(
             @PathVariable(name = "id") Long profileId,
-            @RequestBody ProfileUpdateDto dto
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestBody ProfileRequestDto dto
     ) {
-        var profile = profileService.updateSettings(profileId, dto);
+        var profile = profileService.updateSettings(userDetails.id(), profileId, dto);
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 

@@ -76,7 +76,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void deleteById_WhenUserExists_ReturnUserIsEmpty() {
+    public void deleteById_WhenUserExists_ShouldDeleteTagetUser() {
         var user = createUser("username", "email@test.ru", "hash_password");
         entityManager.persistAndFlush(user);
 

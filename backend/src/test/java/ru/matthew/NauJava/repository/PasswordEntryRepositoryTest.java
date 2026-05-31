@@ -13,8 +13,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
+import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpec;
+import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.Pbkdf2Spec;
 import ru.matthew.NauJava.domain.password.PasswordEntry;
 import ru.matthew.NauJava.domain.password.PasswordEntryRepository;
+import ru.matthew.NauJava.domain.profile.Profile;
+import ru.matthew.NauJava.domain.user.Role;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -27,6 +31,8 @@ public class PasswordEntryRepositoryTest {
     private PasswordEntryRepository passwordEntryRepository;
     private TestEntityManager entityManager;
     private User user;
+    private Long profileId;
+    private Profile profile;
 
     @Autowired
     public PasswordEntryRepositoryTest(PasswordEntryRepository passwordEntryRepository, TestEntityManager entityManager) {
@@ -38,6 +44,9 @@ public class PasswordEntryRepositoryTest {
         var user = new User();
         user.setUsername(username);
         user.setEmail(email);
+        user.setPassword("hash_password");
+        user.setCreatedAt(LocalDateTime.now());
+        user.setRole(Role.USER);
         return user;
     }
 
@@ -51,12 +60,28 @@ public class PasswordEntryRepositoryTest {
         return entry;
     }
 
+    private Profile createProfile() {
+        var profile = new Profile.ProfileBuilder()
+                .name("name")
+                .passwordLength(12)
+                .cipher(CipherAlgorithmSpec.AES)
+                .kdfAlgorithm(Pbkdf2Spec.PBKDF_2)
+                .build();
+        profile.setId(profileId);
+        profile.setCreateAt(LocalDateTime.now());
+        return profile;
+    }
+
     @BeforeEach
     public void setUp() {
         entityManager.clear();
 
+        profile = createProfile();
         user = createUser("username", "test@domain.ru");
-        entityManager.persistAndFlush(user);
+        entityManager.persist(user);
+        profile.setUser(user);
+        entityManager.persist(profile);
+        entityManager.flush();
     }
 
     @Test
@@ -75,6 +100,10 @@ public class PasswordEntryRepositoryTest {
         entry2.setUser(user);
         entry3.setUser(user);
         entry4.setUser(user);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
+        entry3.setProfile(profile);
+        entry4.setProfile(profile);
 
         entityManager.persist(entry1);
         entityManager.persist(entry2);
@@ -101,6 +130,7 @@ public class PasswordEntryRepositoryTest {
     public void findAllByUserIdAndCreatedAtBetween_WhenEntryExists_ReturnPaginatedEntries() {
         var entry = createPasswordEntry("serviceName", "login");
         entry.setUser(user);
+        entry.setProfile(profile);
         user.addPasswordEntries(entry);
 
         entityManager.persistAndFlush(entry);
@@ -117,6 +147,9 @@ public class PasswordEntryRepositoryTest {
         aEntry1.setUser(user);
         aEntry2.setUser(user);
         aEntry3.setUser(user);
+        aEntry1.setProfile(profile);
+        aEntry2.setProfile(profile);
+        aEntry3.setProfile(profile);
         user.addPasswordEntries(aEntry1);
         user.addPasswordEntries(aEntry2);
         user.addPasswordEntries(aEntry3);
@@ -155,6 +188,8 @@ public class PasswordEntryRepositoryTest {
         user.addPasswordEntries(entry2);
         entry1.setUser(user);
         entry2.setUser(user);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
 
         entityManager.persist(entry1);
         entityManager.persist(entry2);
@@ -184,6 +219,8 @@ public class PasswordEntryRepositoryTest {
         user.addPasswordEntries(entry2);
         entry1.setUser(user);
         entry2.setUser(user);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
 
         entityManager.persistAndFlush(entry1);
         entityManager.persistAndFlush(entry2);
@@ -226,12 +263,16 @@ public class PasswordEntryRepositoryTest {
         entry2.setUser(user);
         entry3.setUser(user);
         entry4.setUser(oUser);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
+        entry3.setProfile(profile);
+        entry4.setProfile(profile);
 
+        entityManager.persist(oUser);
         entityManager.persist(entry1);
         entityManager.persist(entry2);
         entityManager.persist(entry3);
         entityManager.persist(entry4);
-        entityManager.persist(oUser);
 
         entityManager.flush();
         entityManager.clear();
@@ -268,12 +309,16 @@ public class PasswordEntryRepositoryTest {
         entry2.setUser(user);
         entry3.setUser(user);
         entry4.setUser(oUser);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
+        entry3.setProfile(profile);
+        entry4.setProfile(profile);
 
+        entityManager.persist(oUser);
         entityManager.persist(entry1);
         entityManager.persist(entry2);
         entityManager.persist(entry3);
         entityManager.persist(entry4);
-        entityManager.persist(oUser);
 
         entityManager.flush();
         entityManager.clear();
@@ -303,12 +348,17 @@ public class PasswordEntryRepositoryTest {
         entry2.setUser(user);
         entry3.setUser(user);
         entry4.setUser(oUser);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
+        entry3.setProfile(profile);
+        entry4.setProfile(profile);
 
+        entityManager.persist(oUser);
         entityManager.persist(entry1);
         entityManager.persist(entry2);
         entityManager.persist(entry3);
         entityManager.persist(entry4);
-        entityManager.persist(oUser);
+
 
         entityManager.flush();
         entityManager.clear();
@@ -338,12 +388,16 @@ public class PasswordEntryRepositoryTest {
         entry2.setUser(user);
         entry3.setUser(user);
         entry4.setUser(oUser);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
+        entry3.setProfile(profile);
+        entry4.setProfile(profile);
 
+        entityManager.persist(oUser);
         entityManager.persist(entry1);
         entityManager.persist(entry2);
         entityManager.persist(entry3);
         entityManager.persist(entry4);
-        entityManager.persist(oUser);
 
         entityManager.flush();
         entityManager.clear();
@@ -357,6 +411,7 @@ public class PasswordEntryRepositoryTest {
     public void deleteAllByUserIdAndCreatedAtBetween_ShouldDeleteOnlyEntriesInsideRange() {
         var entry = createPasswordEntry("serviceName", "login");
         entry.setUser(user);
+        entry.setProfile(profile);
         user.addPasswordEntries(entry);
 
         entityManager.persistAndFlush(entry);
@@ -373,6 +428,9 @@ public class PasswordEntryRepositoryTest {
         oEntry1.setUser(user);
         oEntry2.setUser(user);
         oEntry3.setUser(user);
+        oEntry1.setProfile(profile);
+        oEntry2.setProfile(profile);
+        oEntry3.setProfile(profile);
         user.addPasswordEntries(oEntry1);
         user.addPasswordEntries(oEntry2);
         user.addPasswordEntries(oEntry3);
@@ -412,12 +470,16 @@ public class PasswordEntryRepositoryTest {
         entry2.setUser(user);
         entry3.setUser(user);
         entry4.setUser(oUser);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
+        entry3.setProfile(profile);
+        entry4.setProfile(profile);
 
+        entityManager.persist(oUser);
         entityManager.persist(entry1);
         entityManager.persist(entry2);
         entityManager.persist(entry3);
         entityManager.persist(entry4);
-        entityManager.persist(oUser);
 
         entityManager.flush();
         entityManager.clear();
@@ -446,6 +508,10 @@ public class PasswordEntryRepositoryTest {
         entry2.setUser(user);
         entry3.setUser(user);
         entry4.setUser(user);
+        entry1.setProfile(profile);
+        entry2.setProfile(profile);
+        entry3.setProfile(profile);
+        entry4.setProfile(profile);
 
         entityManager.persist(entry1);
         entityManager.persist(entry2);

@@ -52,18 +52,34 @@ public class RandomGeneratorServiceImpl implements RandomGeneratorService {
             password[currentIdx++] = c;
         }
 
-        String fullPool = pool.toString();
-
         if (!dto.isDuplicateChars()) {
-            if (pool.length() < passwordLength) {
+            ArrayList<Character> uniquePool = new ArrayList<>();
+            for (int i = 0; i < pool.length(); i++) {
+                char ch = pool.charAt(i);
+                if (!uniquePool.contains(ch)) {
+                    uniquePool.add(ch);
+                }
+            }
+
+            for (char ch : guaranteedChars) {
+                uniquePool.remove(Character.valueOf(ch));
+            }
+
+            int neededChars = passwordLength - currentIdx;
+            if (uniquePool.size() < neededChars) {
                 throw new IllegalArgumentException("Уникальных символов в пуле меньше, чем требуемая длина пароля.");
             }
 
-            char[] poolArray = fullPool.toCharArray();
-            shuffle(poolArray);
+            char[] remainingPoolArray = new char[uniquePool.size()];
+            for (int i = 0; i < uniquePool.size(); i++) {
+                remainingPoolArray[i] = uniquePool.get(i);
+            }
 
-            System.arraycopy(poolArray, currentIdx, password, currentIdx, passwordLength - currentIdx);
+            shuffle(remainingPoolArray);
+
+            System.arraycopy(remainingPoolArray, 0, password, currentIdx, neededChars);
         } else {
+            String fullPool = pool.toString();
             for (int i = currentIdx; i < passwordLength; i++) {
                 password[i] = getRandomChar(fullPool);
             }
@@ -83,7 +99,6 @@ public class RandomGeneratorServiceImpl implements RandomGeneratorService {
         if (dto.isLowercase()) ++count;
         if (dto.isDigits()) ++count;
         if (dto.isSpecialChars()) ++count;
-        if (dto.isDuplicateChars()) ++count;
         return count;
     }
 

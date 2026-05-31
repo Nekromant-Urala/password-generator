@@ -33,7 +33,6 @@ public class AuditController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             Model model
     ) {
-        // Получаем информацию о текущем пользователе (админе) для бокового меню
         var userDto = userService.findByUsername(userDetails.getUsername());
         long total = auditService.countAllEvent();
         int safePage = clampVaultPage(total, page);
@@ -54,8 +53,8 @@ public class AuditController {
 
         model.addAttribute("totalUsers", auditService.countAllUser());
         model.addAttribute("totalEntries", auditService.countAllPasswordEntries());
-        model.addAttribute("newEntries24h", "123");
-        model.addAttribute("topAlgorithm", "AES");
+        model.addAttribute("newUsers24h", auditService.countAllUserForLastDay());
+        model.addAttribute("topAlgorithm", auditService.getMostPopularCipher());
 
         return "/statistics/audit";
     }

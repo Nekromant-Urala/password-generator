@@ -79,10 +79,11 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
         );
 
         var profile = profileRepository.findByUserIdAndName(userId, dto.profileName())
-                .orElse(profileRepository.findByUserIdAndName(userId, "default") // нужно добавить смену с дефолтного на выбранный (при создании дефолтный всегда выбранный)
+                .orElse(profileRepository.findByUserIdAndIsFavoriteTrue(userId)
                         .orElseThrow(
                                 () -> new ProfileNotFoundException("Не удалось подобрать необходимый профайл для создания пароля")
-                        ));
+                        )
+                );
 
         entry.setUser(user);
         entry.setProfile(profile);
@@ -99,8 +100,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
                             charsToBytes(password),
                             user.getPassword().toCharArray(),
                             profile.getCipher(),
-                            profile.getKdfAlgorithm(),
-                            profile.getIterations()
+                            profile.getKdfAlgorithm()
                     )
             ));
 
@@ -153,15 +153,6 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
                 .map(passwordEntryMapper::toPasswordEntryResponseDto);
     }
 
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<PasswordEntryResponseDto> findAllForUser(Long userId) {
-        return passwordEntryRepository.findAllByUserId(userId).stream()
-                .map(passwordEntryMapper::toPasswordEntryResponseDto)
-                .toList();
-    }
-
     @Override
     @Transactional(readOnly = true)
     public Page<PasswordEntryResponseDto> findAllByPageForUser(Long userId, Pageable pageable) {
@@ -197,8 +188,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
                             charsToBytes(entry.getPassword().toCharArray()),
                             entry.getUser().getPassword().toCharArray(),
                             profile.getCipher(),
-                            profile.getKdfAlgorithm(),
-                            profile.getIterations()
+                            profile.getKdfAlgorithm()
                     )
             ));
         } catch (EncryptionException e) {
@@ -222,8 +212,7 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
                                 charsToBytes(dto.password()),
                                 newEntry.getUser().getPassword().toCharArray(),
                                 profile.getCipher(),
-                                profile.getKdfAlgorithm(),
-                                profile.getIterations()
+                                profile.getKdfAlgorithm()
                         )));
             } else {
                 newEntry.setPassword(oldEntry.getPassword());

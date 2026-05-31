@@ -56,7 +56,6 @@ public class ProfileRepositoryTest {
                 .customChars("")
                 .kdfAlgorithm(Pbkdf2Spec.PBKDF_2)
                 .cipher(CipherAlgorithmSpec.AES)
-                .iterations(10000)
                 .build();
     }
 

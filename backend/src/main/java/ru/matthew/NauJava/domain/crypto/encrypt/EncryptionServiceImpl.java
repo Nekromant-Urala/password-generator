@@ -14,27 +14,23 @@ import ru.matthew.NauJava.domain.crypto.generation.RandomBytesGenerator;
 
 import javax.crypto.SecretKey;
 import java.nio.ByteBuffer;
-import java.security.SecureRandom;
 
 @Service
 public class EncryptionServiceImpl implements EncryptionService {
 
     private final CipherFactory cipherFactory;
     private final KdfFactory keyGeneratorFactory;
-    private final RandomBytesGenerator randomBytesGenerator = (arrayLength) -> {
-        byte[] randomBytes = new byte[arrayLength];
-        new SecureRandom().nextBytes(randomBytes);
-        return randomBytes;
-    };
+    private final RandomBytesGenerator randomBytesGenerator;
 
     @Autowired
-    public EncryptionServiceImpl(CipherFactory cipherFactory, KdfFactory keyGeneratorFactory) {
+    public EncryptionServiceImpl(CipherFactory cipherFactory, KdfFactory keyGeneratorFactory, RandomBytesGenerator randomBytesGenerator) {
         this.cipherFactory = cipherFactory;
         this.keyGeneratorFactory = keyGeneratorFactory;
+        this.randomBytesGenerator = randomBytesGenerator;
     }
 
     @Override
-    public byte[] encrypt(byte[] data, char[] masterPassword, CipherAlgorithmSpec cipherAlgorithm, KdfAlgorithmSpec keyGenerator, int iterations) {
+    public byte[] encrypt(byte[] data, char[] masterPassword, CipherAlgorithmSpec cipherAlgorithm, KdfAlgorithmSpec keyGenerator) {
         try {
             SymmetricCipher cipher = cipherFactory.getCipher(cipherAlgorithm);
             SecretKeyGenerator secretKeyGenerator = keyGeneratorFactory.getSecretKeyGenerator(keyGenerator);
@@ -42,7 +38,7 @@ public class EncryptionServiceImpl implements EncryptionService {
             byte[] salt = randomBytesGenerator.getRandomBytes(cipher.getSpec().getSaltLengthByte());
             byte[] iv = randomBytesGenerator.getRandomBytes(cipher.getSpec().getIvLengthByte());
 
-            SecretKey key = secretKeyGenerator.generateSecretKey(cipher.getSpec(), masterPassword, salt, iterations);
+            SecretKey key = secretKeyGenerator.generateSecretKey(cipher.getSpec(), masterPassword, salt, keyGenerator.getIterations());
 
             byte[] encryptedData = cipher.encrypt(data, key, iv);
             byte[] encryptedDataWithMeta = ByteBuffer.allocate(iv.length + salt.length + encryptedData.length)
@@ -59,7 +55,7 @@ public class EncryptionServiceImpl implements EncryptionService {
     }
 
     @Override
-    public byte[] decrypt(byte[] encryptedData, char[] masterPassword, CipherAlgorithmSpec cipherAlgorithm, KdfAlgorithmSpec keyGenerator, int iterations) {
+    public byte[] decrypt(byte[] encryptedData, char[] masterPassword, CipherAlgorithmSpec cipherAlgorithm, KdfAlgorithmSpec keyGenerator) {
         try {
             SymmetricCipher cipher = cipherFactory.getCipher(cipherAlgorithm);
             SecretKeyGenerator secretKeyGenerator = keyGeneratorFactory.getSecretKeyGenerator(keyGenerator);
@@ -74,7 +70,7 @@ public class EncryptionServiceImpl implements EncryptionService {
             byte[] encryptedDataWithoutMeta = new byte[buffer.remaining()];
             buffer.get(encryptedDataWithoutMeta);
 
-            SecretKey secretKey = secretKeyGenerator.generateSecretKey(cipher.getSpec(), masterPassword, salt, iterations);
+            SecretKey secretKey = secretKeyGenerator.generateSecretKey(cipher.getSpec(), masterPassword, salt, keyGenerator.getIterations());
 
             return cipher.decrypt(encryptedDataWithoutMeta, secretKey, iv);
 

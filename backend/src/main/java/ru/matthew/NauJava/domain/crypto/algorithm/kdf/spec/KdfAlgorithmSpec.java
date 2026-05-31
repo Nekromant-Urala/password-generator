@@ -6,4 +6,5 @@ package ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec;
 public interface KdfAlgorithmSpec {
     String getName();
     String getMode();
+    int getIterations();
 }

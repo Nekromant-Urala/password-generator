@@ -28,7 +28,7 @@ public class PasswordEntryRestController {
     @PostMapping
     public ResponseEntity<PasswordEntryResponseDto> createEntry(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody PasswordEntryRequestDto dto
+            @Valid @RequestBody PasswordEntryRequestDto dto
     ) {
         var entry = passwordEntryService.createPasswordEntry(userDetails.id(), dto);
         return new ResponseEntity<>(entry, HttpStatus.CREATED);
@@ -46,7 +46,7 @@ public class PasswordEntryRestController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Pageable pageable
     ) {
-        if (filter.serviceName() != null) {
+        if (filter.serviceName() != null && !filter.serviceName().isEmpty()) {
             var entries = passwordEntryService.findByServiceName(userDetails.id(), filter.serviceName(), pageable);
             return new ResponseEntity<>(entries, HttpStatus.OK);
         } else if (filter.createdAt() != null) {
@@ -69,7 +69,7 @@ public class PasswordEntryRestController {
     @PatchMapping("/{id}")
     public ResponseEntity<PasswordEntryResponseDto> updateDetails(
             @PathVariable(name = "id") Long entryId,
-            @RequestBody PasswordEntryUpdateDto updateDto
+            @Valid @RequestBody PasswordEntryUpdateDto updateDto
     ) {
         var entry = passwordEntryService.updatePatchEntry(entryId, updateDto);
         return new ResponseEntity<>(entry, HttpStatus.OK);

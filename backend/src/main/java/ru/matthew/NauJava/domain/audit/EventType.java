@@ -2,8 +2,6 @@ package ru.matthew.NauJava.domain.audit;
 
 public enum EventType {
     SIGN_UP_USER,
-    UPDATE_USER,
-    DELETE_USER,
     SIGN_IN_USER,
     LOGOUT_USER,
     CREATE_PROFILE,

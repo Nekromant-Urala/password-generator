@@ -1,5 +1,6 @@
 package ru.matthew.NauJava.domain.auth;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<UserResponseDto> signUp(@RequestBody UserCreateDto dto) {
+    public ResponseEntity<UserResponseDto> signUp(@Valid @RequestBody UserCreateDto dto) {
         var userDto = userService.createUser(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }

@@ -16,11 +16,10 @@ public interface EncryptionService {
      * @param masterPassword  мастер-пароль пользователя
      * @param cipherAlgorithm название алгоритма, которым необходимо зашифровывать данные (представлено в виде перечисления {@link CipherAlgorithmSpec})
      * @param keyGenerator    название алгоритма, которым необходимо создать секретный ключ (представлено в виде перечисления {@link KdfAlgorithmSpec})
-     * @param iterations      количество итераций, которое необходимо совершить при шифровании
      * @return Возвращает зашифрованные данные в виде массива байт в кодировке Base64
      * @throws {@link EncryptionException} Выбрасывается при любой ошибке шифрования данных
      */
-    byte[] encrypt(byte[] data, char[] masterPassword, CipherAlgorithmSpec cipherAlgorithm, KdfAlgorithmSpec keyGenerator, int iterations);
+    byte[] encrypt(byte[] data, char[] masterPassword, CipherAlgorithmSpec cipherAlgorithm, KdfAlgorithmSpec keyGenerator);
 
     /**
      * Метод для расшифровывания данных
@@ -29,9 +28,8 @@ public interface EncryptionService {
      * @param masterPassword  мастер-пароль пользователя
      * @param cipherAlgorithm название алгоритма, которым зашифровывались данные (представлено в виде перечисления {@link CipherAlgorithmSpec})
      * @param keyGenerator    название алгоритма, которым создавался секретный ключ (представлено в виде перечисления {@link KdfAlgorithmSpec})
-     * @param iterations      количество итераций, при которых зашифровывались данные
      * @return Возвращает расшифрованные данные в виде массива байт
      * @throws {@link EncryptionException} Выбрасывается при любой ошибке расшифровки данных
      */
-    byte[] decrypt(byte[] encryptedData, char[] masterPassword, CipherAlgorithmSpec cipherAlgorithm, KdfAlgorithmSpec keyGenerator, int iterations);
+    byte[] decrypt(byte[] encryptedData, char[] masterPassword, CipherAlgorithmSpec cipherAlgorithm, KdfAlgorithmSpec keyGenerator);
 }
