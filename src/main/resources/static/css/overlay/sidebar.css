@@ -1,0 +1,133 @@
+.vault-sidebar {
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 300px;
+    height: 100vh;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 2000;
+    transition: left 0.3s ease-in-out;
+    padding: 40px 25px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0;
+    box-shadow: 5px 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.vault-sidebar.open {
+    left: 0;
+}
+
+.vault-sidebar h2 {
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+    margin-top: 10px;
+    color: #ffffff;
+}
+
+.user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: #ffffff;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+}
+
+.user-meta span {
+    opacity: 0.8;
+}
+
+/* Новые стили контейнера навигации */
+.sidebar-nav {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-nav .btn-secondary,
+.sidebar-nav .nav-link {
+    text-align: center;
+    text-decoration: none;
+    padding: 8px;
+}
+
+/* Стили для формы и кнопки выхода */
+.vault-actions .btn-logout {
+    width: 100%;
+}
+
+/* Форма и кнопка выхода */
+.vault-sidebar .vault-actions .btn-secondary {
+    width: 100%;
+}
+
+.close-sidebar-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: 0.2s;
+    padding: 0;
+}
+
+.close-sidebar-btn:hover {
+    color: #fff;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.sidebar-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+.menu-trigger-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1500;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: 0.3s ease;
+}
+
+.menu-trigger-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: #fff;
+    transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+    .menu-trigger-btn {
+        top: 10px;
+        left: 10px;
+        padding: 8px 12px;
+        font-size: 1.2rem;
+    }
+}

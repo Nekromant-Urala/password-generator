@@ -4,15 +4,43 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
-import static ru.matthew.NauJava.entity.Role.ADMIN;
+import static ru.matthew.NauJava.domain.user.Role.ADMIN;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private static final String SIGN_IN = "/sign-in";
+    private static final String LOGOUT = "/logout";
+    private static final String JSESSIONID = "JSESSIONID";
+    private static final String SIGN_IN_SUCCESS_REDIRECT = "/passwords";
+    private static final String SIGN_IN_ERROR = "/sign-in?error";
+    private static final String SIGN_IN_EXPIRE = "/sign-in?expired";
+
+    private static final String[] ADMIN_ONLY_REQUESTS = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/api/v1/**",
+            "/audit/**"
+    };
+
+    private static final String[] PERMIT_ALL_USER = {
+            "/sign-in",
+            "/sign-up",
+            "/css/**",
+            "/images/**",
+            "/js/**"
+    };
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
@@ -20,21 +48,53 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**", "/reports/**"))
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler loginSuccessHandler() {
+        var handler = new SavedRequestAwareAuthenticationSuccessHandler();
+        handler.setDefaultTargetUrl(SIGN_IN_SUCCESS_REDIRECT);
+        handler.setAlwaysUseDefaultTargetUrl(true);
+        return handler;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, SessionRegistry sessionRegistry, AuthenticationSuccessHandler loginSuccessHandler) throws Exception {
+        http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/registration").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/**", "/reports/**").hasAuthority(ADMIN.getAuthority())
-                        .anyRequest().authenticated())
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/passwords/view/entries")
-                        .permitAll())
+                        .requestMatchers(PERMIT_ALL_USER).permitAll()
+                        .requestMatchers(ADMIN_ONLY_REQUESTS).hasAuthority(ADMIN.name())
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage(SIGN_IN)
+                        .loginProcessingUrl(SIGN_IN)
+                        .successHandler(loginSuccessHandler)
+                        .failureUrl(SIGN_IN_ERROR)
+                        .permitAll()
+                )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/user/login")
-                        .deleteCookies("JSESSIONID"));
+                        .logoutUrl(LOGOUT)
+                        .logoutSuccessUrl(SIGN_IN)
+                        .deleteCookies(JSESSIONID)
+                        .invalidateHttpSession(true)
+                        .permitAll()
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .maximumSessions(1)
+                        .sessionRegistry(sessionRegistry)
+                        .maxSessionsPreventsLogin(false)
+                        .expiredUrl(SIGN_IN_EXPIRE)
+                );
+
         return http.build();
     }
 }

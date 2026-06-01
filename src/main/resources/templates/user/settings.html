@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Настройки аккаунта</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<button type="button" class="menu-trigger-btn" title="Профиль">☰</button>
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<aside id="userSidebar" class="vault-sidebar">
+  <button type="button" class="close-sidebar-btn">&times;</button>
+  <h2>Пользователь</h2>
+  <div class="user-meta">
+    <div><span>Логин:</span> <strong th:text="${username}">user</strong></div>
+    <div><span>Email:</span> <strong th:text="${userEmail}">user@mail.com</strong></div>
+    <div><span>Роль:</span> <strong th:text="${userRole}">USER</strong></div>
+  </div>
+
+  <div class="sidebar-nav">
+    <a th:href="@{/passwords}" class="btn-secondary">Мои пароли</a>
+    <a th:href="@{/profiles}" class="btn-secondary">Настройки генерации</a>
+    <a th:if="${#strings.containsIgnoreCase(userRole, 'ADMIN')}" th:href="@{/audit}" class="btn-secondary">Аудит и статистика</a>
+    <a th:if="${#strings.containsIgnoreCase(userRole, 'ADMIN')}" th:href="@{http://localhost:8080/swagger-ui/index.html}" class="btn-secondary" target="_blank">Swagger API</a>
+    <a th:href="@{/settings}" class="btn-secondary">Настройки аккаунта</a>
+  </div>
+
+  <form th:action="@{/logout}" method="post" class="vault-actions">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <button type="submit" class="btn-secondary">Выйти</button>
+  </form>
+</aside>
+
+<div class="vault-wrapper">
+  <div class="vault-layout">
+    <main class="vault-content">
+      <header class="vault-header">
+        <div>
+          <h1>Настройки аккаунта</h1>
+          <p class="vault-subtitle">Обновление личных данных и параметров безопасности</p>
+        </div>
+      </header>
+
+      <div th:if="${successMessage}" class="auth-note">
+        <p th:text="${successMessage}">Изменения успешно сохранены</p>
+      </div>
+      <div th:if="${errorMessage}" class="auth-error">
+        <p th:text="${errorMessage}">Ошибка при обновлении параметров</p>
+      </div>
+
+      <div class="settings-grid">
+
+        <div class="settings-card">
+          <h2>Личные данные</h2>
+          <form th:action="@{/settings/profile}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <div class="input-field">
+              <input type="text" id="settingsUsername" name="username" th:value="${username}"/>
+              <label>Имя пользователя</label>
+            </div>
+
+            <div class="input-field">
+              <input type="email" id="settingsEmail" name="email" th:value="${userEmail}"/>
+              <label>Email</label>
+            </div>
+
+            <div class="card-actions">
+              <button class="update-settings" type="submit">Сохранить изменения</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="settings-card">
+          <h2>Безопасность</h2>
+          <form th:action="@{/settings/password}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <div class="input-field">
+              <input type="password" id="currentPassword" name="oldPassword" required/>
+              <label>Текущий пароль</label>
+            </div>
+
+            <div class="input-field">
+              <input type="password" id="newPassword" name="newPassword" required/>
+              <label>Новый пароль</label>
+            </div>
+
+            <div class="card-actions">
+              <button class="update-settings" type="submit">Обновить пароль</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script defer th:src="@{/js/settings.js}"></script>
+<script defer th:src="@{/js/sidebar.js}"></script>
+</body>
+</html>

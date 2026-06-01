@@ -14,30 +14,51 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-timeout: 20000
+
+  sql:
+    init:
+      data-locations: classpath:sql/init.sql
+      mode: always
+
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+    hibernate:
+      ddl-auto: create-drop
+
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         show_sql: true
         highlight_sql: true
-        hbm2ddl:
-          auto: update
-  data:
-    rest:
-      base-path: /api
+
+    defer-datasource-initialization: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibaenate.orm.results: TRACE
+  file:
+    name: ./logs/app.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: ./logs/app-%d{yyyy-MM-dd}.%i.log
+      max-file-size: 10MB
+      total-size-cap: 10GB
+      max-history: 10
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-
-app:
-  name: "Password Generator"
-  version: "1.0.1"
-  time:
-    formatter: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
-  message:
-    name: "%s  INFO Текущее название приложения: %s\n"
-    version: "%s  INFO Текущая версия приложения: %s\n"

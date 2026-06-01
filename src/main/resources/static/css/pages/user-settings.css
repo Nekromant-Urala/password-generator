@@ -1,0 +1,39 @@
+/* Сетка для разделения блоков личных данных и безопасности */
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin-top: 24px;
+}
+
+/* Стилизованный контейнер формы */
+.settings-card {
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 30px;
+    min-height: 350px;
+}
+
+.card-actions {
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+.settings-card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Растягивание кнопки на ширину карточки настроек */
+.settings-card button[type="submit"] {
+    width: 100%;
+}
+
+.update-settings {
+    margin-top: 73px
+}
