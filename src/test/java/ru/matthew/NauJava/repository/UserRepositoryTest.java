@@ -8,10 +8,12 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
+import ru.matthew.NauJava.domain.user.Role;
 import ru.matthew.NauJava.domain.user.User;
 import ru.matthew.NauJava.domain.user.UserRepository;
 
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.*;
+import static ru.matthew.NauJava.domain.user.Role.USER;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -32,6 +34,7 @@ public class UserRepositoryTest {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(password);
+        user.setRole(USER);
         return user;
     }
 

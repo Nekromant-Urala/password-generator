@@ -17,9 +17,12 @@ import ru.matthew.NauJava.domain.crypto.algorithm.cipher.spec.CipherAlgorithmSpe
 import ru.matthew.NauJava.domain.crypto.algorithm.kdf.spec.Pbkdf2Spec;
 import ru.matthew.NauJava.domain.profile.Profile;
 import ru.matthew.NauJava.domain.profile.ProfileRepository;
+import ru.matthew.NauJava.domain.user.Role;
 import ru.matthew.NauJava.domain.user.User;
 
 import java.time.LocalDateTime;
+
+import static ru.matthew.NauJava.domain.user.Role.USER;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -40,6 +43,8 @@ public class ProfileRepositoryTest {
         var user = new User();
         user.setUsername(username);
         user.setEmail(email);
+        user.setPassword("hash_password");
+        user.setRole(USER);
         return user;
     }
 

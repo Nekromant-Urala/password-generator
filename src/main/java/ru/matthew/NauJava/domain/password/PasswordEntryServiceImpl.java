@@ -79,10 +79,9 @@ public class PasswordEntryServiceImpl implements PasswordEntryService {
         );
 
         var profile = profileRepository.findByUserIdAndName(userId, dto.profileName())
-                .orElse(profileRepository.findByUserIdAndIsFavoriteTrue(userId)
-                        .orElseThrow(
-                                () -> new ProfileNotFoundException("Не удалось подобрать необходимый профайл для создания пароля")
-                        )
+                .or(() -> profileRepository.findByUserIdAndIsFavoriteTrue(userId))
+                .orElseThrow(
+                        () -> new ProfileNotFoundException("Не удалось подобрать необходимый профайл для создания пароля")
                 );
 
         entry.setUser(user);

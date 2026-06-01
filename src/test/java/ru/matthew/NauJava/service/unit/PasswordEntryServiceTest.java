@@ -26,7 +26,9 @@ import ru.matthew.NauJava.domain.password.dto.PasswordEntryResponseDto;
 import ru.matthew.NauJava.domain.password.mapper.PasswordEntryMapper;
 import ru.matthew.NauJava.domain.profile.Profile;
 import ru.matthew.NauJava.domain.profile.ProfileRepository;
+import ru.matthew.NauJava.domain.profile.dto.ProfileForPasswordDto;
 import ru.matthew.NauJava.domain.profile.mapper.ProfileMapper;
+import ru.matthew.NauJava.domain.user.Role;
 import ru.matthew.NauJava.domain.user.User;
 import ru.matthew.NauJava.domain.user.UserRepository;
 
@@ -37,6 +39,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static ru.matthew.NauJava.domain.user.Role.USER;
 
 @ExtendWith(MockitoExtension.class)
 public class PasswordEntryServiceTest {
@@ -74,6 +77,8 @@ public class PasswordEntryServiceTest {
         var user = new User();
         user.setUsername(username);
         user.setEmail(email);
+        user.setPassword("hash_password");
+        user.setRole(USER);
         return user;
     }
 
@@ -81,7 +86,7 @@ public class PasswordEntryServiceTest {
         var entry = new PasswordEntry();
         entry.setServiceName(service);
         entry.setLogin(login);
-        entry.setPassword("password");
+        entry.setPassword("pass");
         entry.setDescription("desc");
         return entry;
     }
@@ -124,17 +129,20 @@ public class PasswordEntryServiceTest {
 
     @Test
     public void createPasswordEntry_Success_ReturnPasswordEntryResponseDto() {
+        var profileName = "default";
         var requestDto = new PasswordEntryRequestDto(
-                "login", "pass".toCharArray(), "service", "desc", "default"
+                "login", "pass".toCharArray(), "service", "desc", profileName
         );
-        var profile = createProfile("default");
-        user.setPassword("userPassword");
+        var profileForPasswordDto = new ProfileForPasswordDto(12, true, true, true, true, true, "");
+        var profile = createProfile(profileName);
+        user.addProfile(profile);
+        profile.setUser(user);
 
         when(passwordEntryMapper.toPasswordEntry(requestDto)).thenReturn(passwordEntry);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(profileRepository.findByUserIdAndName(anyLong(), anyString())).thenReturn(Optional.of(profile));
+        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(user));
+        when(profileRepository.findByUserIdAndName(userId, profileName)).thenReturn(Optional.of(profile));
 
-        when(encryptionService.encrypt(any(), any(), any(), any())).thenReturn(new byte[]{1, 2, 3});
+        when(encryptionService.encrypt(any(), any(), any(), any())).thenReturn(new byte[]{1, 2, 3, 4, 5});
         when(passwordEntryRepository.save(passwordEntry)).thenReturn(savedPasswordEntry);
         when(passwordEntryMapper.toPasswordEntryResponseDto(savedPasswordEntry)).thenReturn(passwordEntryResponseDto);
 
@@ -145,31 +153,42 @@ public class PasswordEntryServiceTest {
         Assertions.assertEquals(service, createdEntry.serviceName());
 
         verify(eventPublisher).publishEvent(any(AuditEventDto.class));
-        verify(passwordEntryRepository).save(passwordEntry);
+
+        verify(generatorService, Mockito.never()).generatePassword(profileForPasswordDto);
+        verify(profileRepository, Mockito.never()).findByUserIdAndIsFavoriteTrue(userId);
     }
 
     @Test
     public void createPasswordEntry_WithEmptyPassword_ShouldGeneratePassword() {
+        var profileName = "default";
         var requestDto = new PasswordEntryRequestDto(
-                "login", new char[0], "service", "desc", "default"
+                "login", new char[0], "service", "desc", profileName
         );
-        var profile = createProfile("default");
-        user.setPassword("userPassword");
+        var profileForPasswordDto = new ProfileForPasswordDto(12, true, true, true, true, true, "");
+        var profile = createProfile(profileName);
+        user.addProfile(profile);
+        profile.setUser(user);
 
         when(passwordEntryMapper.toPasswordEntry(requestDto)).thenReturn(passwordEntry);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
         when(profileRepository.findByUserIdAndName(userId, profile.getName())).thenReturn(Optional.of(profile));
-        when(profileMapper.toProfileForPasswordDto(any())).thenReturn(null);
-        when(generatorService.generatePassword(any())).thenReturn("generatedPass".toCharArray());
-        when(encryptionService.encrypt(any(), any(), any(), any())).thenReturn(new byte[]{1, 2, 3});
+        when(profileMapper.toProfileForPasswordDto(profile)).thenReturn(profileForPasswordDto);
+        when(generatorService.generatePassword(profileForPasswordDto)).thenReturn("generatedPass".toCharArray());
+
+        when(encryptionService.encrypt(any(), any(), any(), any())).thenReturn(new byte[]{1, 2, 3, 4, 5});
         when(passwordEntryRepository.save(passwordEntry)).thenReturn(savedPasswordEntry);
         when(passwordEntryMapper.toPasswordEntryResponseDto(savedPasswordEntry)).thenReturn(passwordEntryResponseDto);
 
         var createdEntry = passwordEntryService.createPasswordEntry(userId, requestDto);
 
         Assertions.assertNotNull(createdEntry);
+        Assertions.assertEquals(passwordEntryId, createdEntry.id());
+        Assertions.assertEquals(service, createdEntry.serviceName());
+
         verify(generatorService).generatePassword(any());
         verify(passwordEntryRepository).save(passwordEntry);
+        verify(profileRepository, Mockito.never()).findByUserIdAndIsFavoriteTrue(userId);
     }
 
     @Test
@@ -278,7 +297,7 @@ public class PasswordEntryServiceTest {
     @Test
     public void updatePatchEntry_Success_ReturnUpdatedPasswordEntryResponseDto() throws Exception {
         var updateDto = new ru.matthew.NauJava.domain.password.dto.PasswordEntryUpdateDto(
-                "newService", "newLogin", new char[]{'n','e','w'}, "newDesc"
+                "newService", "newLogin", new char[]{'n', 'e', 'w'}, "newDesc"
         );
 
         var profile = createProfile("default");

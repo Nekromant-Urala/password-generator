@@ -52,7 +52,7 @@ public class ProfileController {
         model.addAttribute("profiles", profiles.getContent());
         model.addAttribute("currentPage", safePage);
 
-        return "/generators/profiles";
+        return "generators/profiles";
     }
 
     @PostMapping("/create")

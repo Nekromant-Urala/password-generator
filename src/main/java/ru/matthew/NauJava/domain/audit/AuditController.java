@@ -56,7 +56,7 @@ public class AuditController {
         model.addAttribute("newUsers24h", auditService.countAllUserForLastDay());
         model.addAttribute("topAlgorithm", auditService.getMostPopularCipher());
 
-        return "/statistics/audit";
+        return "statistics/audit";
     }
 
     private static int clampVaultPage(long totalElements, int page) {

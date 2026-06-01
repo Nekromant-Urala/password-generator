@@ -50,7 +50,7 @@ public class PasswordEntryController {
         model.addAttribute("userRole", userDto.role());
         model.addAttribute("username", userDto.username());
 
-        return "/passwords/entries";
+        return "passwords/entries";
     }
 
     @PostMapping("/create")
