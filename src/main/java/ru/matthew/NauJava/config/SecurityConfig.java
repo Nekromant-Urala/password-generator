@@ -31,8 +31,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api/v1/**",
-            "/reports/**",
-            "/user/**"
+            "/audit/**"
     };
 
     private static final String[] PERMIT_ALL_USER = {
@@ -71,7 +70,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PERMIT_ALL_USER).permitAll()
-                        .requestMatchers(ADMIN_ONLY_REQUESTS).hasAuthority(ADMIN.getAuthority())
+                        .requestMatchers(ADMIN_ONLY_REQUESTS).hasAuthority(ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

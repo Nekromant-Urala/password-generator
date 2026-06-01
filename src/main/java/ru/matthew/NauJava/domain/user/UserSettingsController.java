@@ -65,7 +65,7 @@ public class UserSettingsController {
     @PostMapping("/password")
     public String changePassword(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @ModelAttribute("updatePasswordDto") UserPatchDto updatePasswordDto,
+            @Valid @ModelAttribute("updatePasswordDto") UserUpdatePasswordDto updatePasswordDto,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes
     ) {
@@ -75,7 +75,7 @@ public class UserSettingsController {
             return "redirect:/settings";
         }
         try {
-            userService.patchUser(userDetails.id(), updatePasswordDto);
+            userService.updatePassword(userDetails.id(), updatePasswordDto);
             redirectAttributes.addFlashAttribute("successMessage", "Пароль успешно изменен!");
         } catch (UserPasswordMissMatchException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
