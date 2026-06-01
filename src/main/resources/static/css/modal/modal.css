@@ -62,3 +62,13 @@
 .modal-content .input-field input:valid {
     border-bottom-color: #fff;
 }
+
+/* Перенесённые стили элементов формы */
+.modal-input-custom-chars {
+    margin-top: 15px;
+}
+
+.btn-submit-profile {
+    width: 100%;
+    margin-top: 15px;
+}

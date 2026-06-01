@@ -19,23 +19,6 @@ form h2 {
     margin-bottom: 20px;
 }
 
-.password-options {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 25px 0 35px 0;
-    color: #fff;
-}
-
-.password-options label {
-    display: flex;
-    align-items: center;
-}
-
-#remember {
-    accent-color: #fff;
-}
-
 .password-options label p {
     margin-left: 8px;
 }

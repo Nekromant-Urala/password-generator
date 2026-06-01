@@ -10,6 +10,8 @@ public record CustomUserDetails(
         Long id,
         String username,
         String password,
+        String email,
+        Role role,
         Collection<? extends GrantedAuthority> authorities
 ) implements UserDetails {
     @Override

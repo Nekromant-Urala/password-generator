@@ -49,7 +49,6 @@ public class ProfileMapper {
         profile.setDigits(dto.isDigits());
         profile.setSpecialChars(dto.isSpecialChars());
         profile.setDuplicateChars(dto.isDuplicateChars());
-        profile.setFavorite(dto.isFavorite());
         profile.setCustomChars(dto.customChars());
         profile.setKdfAlgorithm(kdfAlgorithmSpec);
         profile.setCipher(cipherAlgorithmSpec);

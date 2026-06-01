@@ -13,7 +13,6 @@ import ru.matthew.NauJava.domain.crypto.exception.EncryptionException;
 import ru.matthew.NauJava.domain.crypto.exception.KdfNotFoundException;
 import ru.matthew.NauJava.domain.password.exception.PasswordEntryDecodeException;
 import ru.matthew.NauJava.domain.profile.exception.ProfileNotFoundException;
-import ru.matthew.NauJava.domain.report.exception.ReportNotFoundException;
 import ru.matthew.NauJava.domain.password.exception.PasswordEntryNotFoundException;
 import ru.matthew.NauJava.domain.user.exception.UserAlreadyExistsException;
 import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
@@ -30,7 +29,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({
-            ReportNotFoundException.class, PasswordEntryNotFoundException.class,
+            PasswordEntryNotFoundException.class,
             ProfileNotFoundException.class, UserNotFoundException.class,
             org.springframework.security.core.userdetails.UsernameNotFoundException.class,
             AuditEventNotFoundException.class

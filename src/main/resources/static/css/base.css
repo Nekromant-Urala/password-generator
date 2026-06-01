@@ -23,3 +23,26 @@ body::before {
     background: url(../images/background.jpg) center/cover;
     z-index: -1;
 }
+
+/* Разметка основного контента */
+.vault-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vault-header h1 {
+    margin-bottom: 4px;
+}
+
+.vault-subtitle {
+    margin-bottom: 0;
+}
+
+.vault-empty .btn-primary {
+    margin-top: 15px;
+}
+
+.js-profile-delete-form {
+    display: inline-flex;
+}

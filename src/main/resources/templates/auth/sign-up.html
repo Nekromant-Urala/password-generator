@@ -10,6 +10,12 @@
 <div class="auth-wrapper">
     <form th:action="@{/sign-up}" method="post">
         <h2>Регистрация</h2>
+        <div th:if="${successMessage}" class="auth-note">
+            <p th:text="${successMessage}">Успешная регистрация</p>
+        </div>
+        <div th:if="${errorMessage}" class="auth-error">
+            <p th:text="${errorMessage}">Ошибка при регистрации</p>
+        </div>
         <div class="input-field">
             <input th:type="text" th:name="email" required>
             <label>Введите вашу почту</label>
@@ -21,10 +27,6 @@
         <div class="input-field">
             <input th:type="password" th:name="password" required>
             <label>Введите пароль</label>
-        </div>
-        <div class="input-field">
-            <input th:type="password" th:name="confirmedPassword" required>
-            <label>Подтвердите пароль</label>
         </div>
         <button type="submit">Регистрация</button>
         <div class="account-options">

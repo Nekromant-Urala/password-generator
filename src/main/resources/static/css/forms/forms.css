@@ -127,6 +127,17 @@ button:hover {
     clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
 }
 
+/* Специфический отступ для полей в модальном окне профилей */
+.input-field.modal-mt-15 {
+    margin-top: 15px;
+}
+
+/* Кнопка отправки формы на всю ширину модального окна */
+.modal-content form button[type="submit"] {
+    width: 100%;
+    margin-top: 15px;
+}
+
 .checkbox-group input[type="checkbox"]:checked {
     border-color: #fff;
 }

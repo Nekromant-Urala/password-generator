@@ -31,7 +31,8 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api/v1/**",
-            "/reports/**"
+            "/reports/**",
+            "/user/**"
     };
 
     private static final String[] PERMIT_ALL_USER = {

@@ -83,7 +83,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
      *
      * @param userId уникальный идентификатор пользователя
      */
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Profile p SET p.isFavorite = false WHERE p.user.id = :userId AND p.isFavorite = true")
     void resetFavoriteProfileForUser(@Param("userId") Long userId);
 

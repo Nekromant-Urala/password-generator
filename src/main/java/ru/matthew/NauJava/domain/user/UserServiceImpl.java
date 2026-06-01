@@ -118,10 +118,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         var user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("Пользователь с id: '%d' не был найден при частичном обновлении данных".formatted(id))
         );
-        if (userRepository.findByUsername(dto.username()).isPresent()) {
+        if (userRepository.findByUsername(dto.username()).filter(u -> !u.getId().equals(id)).isPresent()) {
             throw new UserAlreadyExistsException("Пользователь с таким именем уже существует");
         }
-        if (userRepository.findByEmail(dto.email()).isPresent()) {
+        if (userRepository.findByEmail(dto.email()).filter(u -> !u.getId().equals(id)).isPresent()) {
             throw new UserAlreadyExistsException("Пользователь с такой почтой уже зарегистрирован");
         }
         userMapper.updateEntityFromPatchDto(user, dto);
@@ -165,6 +165,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                         u.getId(),
                         u.getUsername(),
                         u.getPassword(),
+                        u.getEmail(),
+                        u.getRole(),
                         Collections.singleton(u.getRole())
                 ))
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username: '%s' не был найден".formatted(username)));

@@ -10,20 +10,19 @@
 <div class="auth-wrapper">
     <form th:action="@{/sign-in}" method="post">
         <h2>Вход</h2>
+        <div th:if="${successMessage}" class="auth-note">
+            <p th:text="${successMessage}">Успешный вход</p>
+        </div>
+        <div th:if="${errorMessage}" class="auth-error">
+            <p th:text="${errorMessage}">Ошибка входа</p>
+        </div>
         <div class="input-field">
             <input th:type="text" th:name="username" required>
-            <label>Введите вашу почту</label>
+            <label>Введите вашу почту или логин</label>
         </div>
         <div class="input-field">
             <input th:type="password" th:name="password" required>
             <label>Введите ваш пароль</label>
-        </div>
-        <div class="password-options">
-            <label for="remember">
-                <input type="checkbox" id="remember">
-                <p>Запомнить меня</p>
-            </label>
-            <a href="">Забыл пароль</a>
         </div>
         <button type="submit">Вход</button>
         <div class="account-options">

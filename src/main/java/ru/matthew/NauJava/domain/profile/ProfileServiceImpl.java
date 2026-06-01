@@ -65,12 +65,16 @@ public class ProfileServiceImpl implements ProfileService {
 
         profile.setUser(user);
         user.addProfile(profile);
-        var savedProfile = profileRepository.save(profile);
+
+        if (profile.isFavorite()) {
+            profileRepository.resetFavoriteProfileForUser(userId);
+        }
+        profile = profileRepository.save(profile);
 
         eventPublisher.publishEvent(new AuditEventDto(userId, CREATE_PROFILE, "создание профиля-генерации"));
         LOGGER.info("Создание профайла-генерация пользователем с id:{}", userId);
 
-        return profileMapper.toProfileResponseDto(savedProfile);
+        return profileMapper.toProfileResponseDto(profile);
     }
 
     @Override
@@ -176,6 +180,9 @@ public class ProfileServiceImpl implements ProfileService {
                 .filter(p -> p.getUser().getId().equals(userId))
                 .orElseThrow(() -> new ProfileNotFoundException(id));
 
+        if (dto.isFavorite()) {
+            setProfileAsFavorite(userId, profile.getId());
+        }
         profileMapper.updateProfileDto(profile, dto);
 
         eventPublisher.publishEvent(new AuditEventDto(profile.getUser().getId(), UPDATE_PROFILE, "обновление настроек профиля-генерации"));

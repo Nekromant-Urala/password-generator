@@ -39,7 +39,7 @@ public class Profile {
     @Column(name = "avoid_ambiguous_chars", nullable = false)
     private boolean isDuplicateChars;
 
-    @Column(name = "is_favorite", nullable = false)
+    @Column(name = "is_favorite")
     private boolean isFavorite;
 
     @Column(name = "custom_chars")

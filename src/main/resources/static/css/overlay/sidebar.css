@@ -39,6 +39,31 @@
     opacity: 0.8;
 }
 
+/* Новые стили контейнера навигации */
+.sidebar-nav {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-nav .btn-secondary,
+.sidebar-nav .nav-link {
+    text-align: center;
+    text-decoration: none;
+    padding: 8px;
+}
+
+/* Стили для формы и кнопки выхода */
+.vault-actions .btn-logout {
+    width: 100%;
+}
+
+/* Форма и кнопка выхода */
+.vault-sidebar .vault-actions .btn-secondary {
+    width: 100%;
+}
+
 .close-sidebar-btn {
     position: absolute;
     top: 15px;

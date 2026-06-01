@@ -7,11 +7,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.matthew.NauJava.domain.crypto.exception.EncryptionException;
 import ru.matthew.NauJava.domain.password.dto.PasswordEntryRequestDto;
 import ru.matthew.NauJava.domain.password.dto.PasswordEntryUpdateDto;
+import ru.matthew.NauJava.domain.password.exception.PasswordEntryNotFoundException;
+import ru.matthew.NauJava.domain.profile.exception.ProfileNotFoundException;
+import ru.matthew.NauJava.domain.user.CustomUserDetails;
 import ru.matthew.NauJava.domain.user.UserService;
+import ru.matthew.NauJava.domain.user.exception.UserNotFoundException;
 
 @Controller
 @RequestMapping("/passwords")
@@ -29,43 +35,51 @@ public class PasswordEntryController {
 
     @GetMapping
     public String passwordPage(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(name = "page", defaultValue = "0") int page,
             Model model
     ) {
-        var userDto = userService.findByUsername(userDetails.getUsername());
-        long total = passwordEntryService.countAllEntryByUserId(userDto.id());
+        long total = passwordEntryService.countAllEntryByUserId(userDetails.id());
         int safePage = clampVaultPage(total, page);
         var pageable = PageRequest.of(
                 safePage,
                 PAGE_SIZE,
                 Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        var entries = passwordEntryService.findAllByPageForUser(userDto.id(), pageable);
+        var entries = passwordEntryService.findAllByPageForUser(userDetails.id(), pageable);
 
         model.addAttribute("entries", entries.getContent());
         model.addAttribute("passwordPage", entries);
         model.addAttribute("currentPage", entries.getNumber());
-        model.addAttribute("userEmail", userDto.email());
-        model.addAttribute("userRole", userDto.role());
-        model.addAttribute("username", userDto.username());
+        model.addAttribute("userEmail", userDetails.email());
+        model.addAttribute("userRole", userDetails.role());
+        model.addAttribute("username", userDetails.username());
 
         return "passwords/entries";
     }
 
     @PostMapping("/create")
     public String createEntry(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @ModelAttribute("passwordEntryRequestDto") PasswordEntryRequestDto dto,
+            BindingResult bindingResult,
             RedirectAttributes redirectAttributes
     ) {
+        if (bindingResult.hasErrors()) {
+            var errorMessage = bindingResult.getAllErrors().getFirst().getDefaultMessage();
+            redirectAttributes.addFlashAttribute("vaultError", errorMessage);
+            return vaultRedirect(0);
+        }
 
-        var userDto = userService.findByUsername(userDetails.getUsername());
-        var entry = passwordEntryService.createPasswordEntry(userDto.id(), dto);
-        if (entry == null) {
-            redirectAttributes.addFlashAttribute("vaultError", "Запись не создана.");
-        } else {
+        try {
+            passwordEntryService.createPasswordEntry(userDetails.id(), dto);
             redirectAttributes.addFlashAttribute("vaultSuccess", "Запись создана.");
+        } catch (UserNotFoundException | ProfileNotFoundException | IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("vaultError", e.getMessage());
+            return vaultRedirect(0);
+        } catch (EncryptionException e) {
+            redirectAttributes.addFlashAttribute("vaultError", "Ошибка при шифровании пароля");
+            return vaultRedirect(0);
         }
 
         return vaultRedirect(0);
@@ -74,19 +88,29 @@ public class PasswordEntryController {
     @PostMapping("/{id}/update")
     public String updateEntry(
             @PathVariable(name = "id") Long entryId,
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @ModelAttribute("passwordEntryDto") PasswordEntryUpdateDto dto,
+            BindingResult bindingResult,
             @RequestParam(name = "page", defaultValue = "0") int page,
             RedirectAttributes redirectAttributes
     ) {
-        var userDto = userService.findByUsername(userDetails.getUsername());
-        var entry = passwordEntryService.updatePatchEntry(entryId, dto);
-        if (entry == null) {
-            redirectAttributes.addFlashAttribute("vaultError", "Запись не найдена или недоступна.");
-        } else {
-            redirectAttributes.addFlashAttribute("vaultSuccess", "Запись обновлена.");
+        if (bindingResult.hasErrors()) {
+            var errorMessage = bindingResult.getAllErrors().getFirst().getDefaultMessage();
+            redirectAttributes.addFlashAttribute("vaultError", errorMessage);
+            return vaultRedirect(0);
         }
-        long total = passwordEntryService.countAllEntryByUserId(userDto.id());
+        try {
+            var entry = passwordEntryService.updatePatchEntry(entryId, dto);
+            redirectAttributes.addFlashAttribute("vaultSuccess", "Запись обновлена.");
+        } catch (PasswordEntryNotFoundException e) {
+            redirectAttributes.addFlashAttribute("vaultError", e.getMessage());
+            return vaultRedirect(0);
+        } catch (EncryptionException e) {
+            redirectAttributes.addFlashAttribute("vaultError", "Ошибка при шифровании пароля");
+            return vaultRedirect(0);
+        }
+
+        long total = passwordEntryService.countAllEntryByUserId(userDetails.id());
         int safePage = clampVaultPage(total, page);
         return vaultRedirect(safePage);
     }
@@ -94,13 +118,12 @@ public class PasswordEntryController {
     @PostMapping("/{id}/delete")
     public String deleteEntry(
             @PathVariable(name = "id") Long entryId,
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(name = "page", defaultValue = "0") int page,
             RedirectAttributes redirectAttributes
     ) {
-        var userDto = userService.findByUsername(userDetails.getUsername());
-        passwordEntryService.deleteById(userDto.id(), entryId);
-        long totalAfter = passwordEntryService.countAllEntryByUserId(userDto.id());
+        passwordEntryService.deleteById(userDetails.id(), entryId);
+        long totalAfter = passwordEntryService.countAllEntryByUserId(userDetails.id());
         int safePage = clampVaultPage(totalAfter, page);
         redirectAttributes.addFlashAttribute("vaultSuccess", "Запись удалена.");
         return vaultRedirect(safePage);
@@ -109,22 +132,25 @@ public class PasswordEntryController {
     @PostMapping("/{id}/reveal")
     public String revealPassword(
             @PathVariable(name = "id") Long entryId,
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(name = "page", defaultValue = "0") int page,
             RedirectAttributes redirectAttributes
     ) {
-        var userDto = userService.findByUsername(userDetails.getUsername());
-        long totalAfter = passwordEntryService.countAllEntryByUserId(userDto.id());
+        long totalAfter = passwordEntryService.countAllEntryByUserId(userDetails.id());
         int safePage = clampVaultPage(totalAfter, page);
-        var entry = passwordEntryService.revealPassword(entryId);
-        if (entry == null) {
+
+        try {
+            var entry = passwordEntryService.revealPassword(entryId);
+            redirectAttributes.addFlashAttribute("revealedEntryId", entryId);
+            redirectAttributes.addFlashAttribute("revealedPassword", new String(entry.pass()));
+            return vaultRedirect(safePage);
+        } catch (PasswordEntryNotFoundException e) {
             redirectAttributes.addFlashAttribute("vaultError", "Пароль не найден или недоступен.");
             return vaultRedirect(safePage);
+        } catch (EncryptionException e) {
+            redirectAttributes.addFlashAttribute("vaultError", "Ошибка при расшифровывании пароля");
+            return vaultRedirect(safePage);
         }
-
-        redirectAttributes.addFlashAttribute("revealedEntryId", entryId);
-        redirectAttributes.addFlashAttribute("revealedPassword", new String(entry.pass()));
-        return vaultRedirect(safePage);
     }
 
     private static int clampVaultPage(long totalElements, int page) {
