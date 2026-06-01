@@ -162,7 +162,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.ural.NauJavaApplication</mainClass>
+                            <mainClass>ru.matthew.NauJava.NauJavaApplication</mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>
