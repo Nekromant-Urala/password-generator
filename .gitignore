@@ -39,6 +39,5 @@ logs/
 
 ### Other Files & Dir ###
 .gitattributes
-src/main/resources/sql/
 src/main/resources/static/temp
 *.p12
