@@ -46,7 +46,7 @@ docker compose up
   sql:
     init:
       data-locations: classpath:sql/init.sql
-      mode: always
+      mode: never
 ```
 ## Что необходимо доработать в текущей версии:
 
